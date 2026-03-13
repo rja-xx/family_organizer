@@ -253,10 +253,23 @@
       "name": "Vaske huset",
       "desc": "",
       "assignee": null,
-      "start": "2026-03-12",
-      "due": "2026-03-14",
+      "start": "2026-03-10",
+      "due": "2026-03-12",
       "status": "Planned",
       "priority": "High",
+      "notes": "",
+      "subtasks": []
+    },
+    {
+      "id": 1773410551222,
+      "name": "storhandle",
+      "desc": "",
+      "assignee": null,
+      "start": "2026-03-10",
+      "due": "2026-03-16",
+      "status": "Completed",
+      "priority": "Medium",
+      "recurrence": "weekly",
       "notes": "",
       "subtasks": []
     }
