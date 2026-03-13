@@ -1003,6 +1003,7 @@
         proj.status = col.dataset.status;
         if (col.dataset.status === 'Completed') applyRecurrence(proj);
         await api.post(`/family/${currentFamily}/projects`, proj);
+        projects = await api.get(`/family/${currentFamily}/projects`);
         render();
       }
     });
@@ -1024,7 +1025,7 @@
     // Returns true if recurrence was applied (i.e. task rolled forward instead of completing)
     if (!proj.recurrence || proj.recurrence === 'none') return false;
     proj.due = nextDueDate(proj.due, proj.recurrence);
-    proj.status = 'In-progress';
+    proj.status = 'Planned';
     return true;
   }
 
