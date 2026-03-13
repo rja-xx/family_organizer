@@ -1,0 +1,118 @@
+{
+  "familyId": "jakobsen",
+  "name": "Jakobsen",
+  "projects": [
+    {
+      "id": 1709465400000,
+      "name": "Reorganize Gym/Storage Room",
+      "desc": "Clear out and reorganize the gym/storage area - sports equipment, weights, off-season clothes, and family items",
+      "owner": "Roger",
+      "status": "Planned",
+      "priority": "Medium",
+      "start": "2026-03-07",
+      "due": "2026-03-21",
+      "notes": "Goal: Create functional zones for gym equipment, sports gear, and seasonal storage",
+      "subtasks": [
+        {
+          "id": 1709465400001,
+          "name": "Clear out & inventory everything",
+          "status": "Planned",
+          "priority": "High",
+          "start": "2026-03-08",
+          "due": "2026-03-08",
+          "notes": "Take everything out, make a list of what we have"
+        },
+        {
+          "id": 1709465400002,
+          "name": "Sort into categories",
+          "status": "Planned",
+          "priority": "High",
+          "start": "2026-03-08",
+          "due": "2026-03-09",
+          "notes": "Categories: weights, sports equipment, off-season clothes, occasional items, trash/donate"
+        },
+        {
+          "id": 1709465400003,
+          "name": "Declutter - donate/sell/trash",
+          "status": "Planned",
+          "priority": "Medium",
+          "start": "2026-03-09",
+          "due": "2026-03-10",
+          "notes": "Be ruthless! If not used in 2 years, let it go"
+        },
+        {
+          "id": 1709465400004,
+          "name": "Plan new layout",
+          "status": "Planned",
+          "priority": "Medium",
+          "start": "2026-03-10",
+          "due": "2026-03-11",
+          "notes": "Sketch zones: workout area, sports gear wall, clothes storage, misc shelving"
+        },
+        {
+          "id": 1709465400005,
+          "name": "Buy storage solutions",
+          "status": "Planned",
+          "priority": "Medium",
+          "start": "2026-03-11",
+          "due": "2026-03-14",
+          "notes": "Wall hooks, clear bins, shelving unit, clothing vacuum bags"
+        },
+        {
+          "id": 1709465400006,
+          "name": "Set up gym/weights zone",
+          "status": "Planned",
+          "priority": "Medium",
+          "start": "2026-03-15",
+          "due": "2026-03-16",
+          "notes": "Weight rack, floor mat, mirror if space allows"
+        },
+        {
+          "id": 1709465400007,
+          "name": "Organize sports equipment",
+          "status": "Planned",
+          "priority": "Medium",
+          "start": "2026-03-16",
+          "due": "2026-03-17",
+          "notes": "Golf clubs, skis, balls, rackets - use wall hooks and bins"
+        },
+        {
+          "id": 1709465400008,
+          "name": "Store off-season clothes",
+          "status": "Planned",
+          "priority": "Low",
+          "start": "2026-03-17",
+          "due": "2026-03-18",
+          "notes": "Vacuum bags for winter/summer clothes, label by family member"
+        },
+        {
+          "id": 1709465400009,
+          "name": "Set up misc/occasional items shelf",
+          "status": "Planned",
+          "priority": "Low",
+          "start": "2026-03-18",
+          "due": "2026-03-19",
+          "notes": "Camping gear, holiday decorations, toolbox"
+        },
+        {
+          "id": 1709465400010,
+          "name": "Label everything",
+          "status": "Planned",
+          "priority": "Low",
+          "start": "2026-03-19",
+          "due": "2026-03-20",
+          "notes": "Clear labels on all bins and shelves"
+        },
+        {
+          "id": 1709465400011,
+          "name": "Final cleanup & family walkthrough",
+          "status": "Planned",
+          "priority": "Medium",
+          "start": "2026-03-21",
+          "due": "2026-03-22",
+          "notes": "Sweep, mop, show everyone where things go!"
+        }
+      ]
+    }
+  ]
+}

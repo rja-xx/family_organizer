@@ -1,0 +1,264 @@
+{
+  "familyId": "testfamily",
+  "name": "The Andersons",
+  "members": [
+    {
+      "id": "member_dad",
+      "name": "Dad",
+      "color": "#6366f1"
+    },
+    {
+      "id": "member_mum",
+      "name": "Mum",
+      "color": "#ec4899"
+    },
+    {
+      "id": "member_emma",
+      "name": "Emma",
+      "color": "#10b981"
+    },
+    {
+      "id": "member_jack",
+      "name": "Jack",
+      "color": "#f59e0b"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1000001,
+      "name": "Kitchen Renovation",
+      "desc": "Full kitchen remodel including new cabinets, countertops and appliances",
+      "assignee": "member_dad",
+      "status": "Completed",
+      "priority": "High",
+      "start": "2026-03-01",
+      "due": "2026-03-12",
+      "notes": "Contractor booked, materials ordered",
+      "subtasks": [
+        {
+          "id": 1000101,
+          "name": "Choose cabinet colour",
+          "status": "Completed",
+          "priority": "High",
+          "assignee": "member_mum",
+          "start": "2026-03-01",
+          "due": "2026-03-03",
+          "notes": "Went with white shaker"
+        },
+        {
+          "id": 1000102,
+          "name": "Order countertop samples",
+          "status": "Completed",
+          "priority": "High",
+          "assignee": "member_mum",
+          "start": "2026-03-03",
+          "due": "2026-03-05",
+          "notes": ""
+        },
+        {
+          "id": 1000103,
+          "name": "Confirm contractor start date",
+          "status": "In-progress",
+          "priority": "High",
+          "assignee": "member_dad",
+          "start": "2026-03-08",
+          "due": "2026-03-12",
+          "notes": "Waiting on callback"
+        },
+        {
+          "id": 1000104,
+          "name": "Clear out kitchen cupboards",
+          "status": "Planned",
+          "priority": "Medium",
+          "assignee": "member_dad",
+          "start": "2026-03-12",
+          "due": "2026-03-12",
+          "notes": "Pack everything in boxes to garage"
+        },
+        {
+          "id": 1000105,
+          "name": "Buy new appliances",
+          "status": "Planned",
+          "priority": "Medium",
+          "assignee": "member_mum",
+          "start": "2026-03-12",
+          "due": "2026-03-18",
+          "notes": "Oven, dishwasher, fridge"
+        }
+      ]
+    },
+    {
+      "id": 1000002,
+      "name": "Plan Summer Holiday",
+      "desc": "Book flights, hotel and activities for family trip to Portugal",
+      "assignee": "member_mum",
+      "status": "Planned",
+      "priority": "Medium",
+      "start": "2026-03-10",
+      "due": "2026-03-25",
+      "notes": "Targeting last 2 weeks of July",
+      "subtasks": [
+        {
+          "id": 1000201,
+          "name": "Research destinations in Portugal",
+          "status": "Completed",
+          "priority": "Medium",
+          "assignee": "member_mum",
+          "start": "2026-03-10",
+          "due": "2026-03-10",
+          "notes": "Lisbon + Algarve shortlisted"
+        },
+        {
+          "id": 1000202,
+          "name": "Compare flights",
+          "status": "In-progress",
+          "priority": "High",
+          "assignee": "member_mum",
+          "start": "2026-03-12",
+          "due": "2026-03-12",
+          "notes": "Check Google Flights and Skyscanner"
+        },
+        {
+          "id": 1000203,
+          "name": "Book hotel / villa",
+          "status": "Planned",
+          "priority": "High",
+          "assignee": "member_mum",
+          "start": "2026-03-12",
+          "due": "2026-03-14",
+          "notes": ""
+        },
+        {
+          "id": 1000204,
+          "name": "Sort travel insurance",
+          "status": "Planned",
+          "priority": "Medium",
+          "assignee": "member_dad",
+          "start": "2026-03-15",
+          "due": "2026-03-20",
+          "notes": ""
+        },
+        {
+          "id": 1000205,
+          "name": "Tell kids about the trip!",
+          "status": "Planned",
+          "priority": "Low",
+          "assignee": "member_mum",
+          "start": "2026-03-20",
+          "due": "2026-03-20",
+          "notes": "Big reveal dinner"
+        }
+      ]
+    },
+    {
+      "id": 1000003,
+      "name": "Kids School Applications",
+      "desc": "Submit secondary school applications for Emma before deadline",
+      "assignee": "member_mum",
+      "status": "Blocked",
+      "priority": "High",
+      "start": "2026-03-05",
+      "due": "2026-03-12",
+      "notes": "Blocked waiting on reference letter from primary school",
+      "subtasks": [
+        {
+          "id": 1000301,
+          "name": "Fill in application form",
+          "status": "Completed",
+          "priority": "High",
+          "assignee": "member_mum",
+          "start": "2026-03-05",
+          "due": "2026-03-07",
+          "notes": ""
+        },
+        {
+          "id": 1000302,
+          "name": "Chase reference letter from school",
+          "status": "Blocked",
+          "priority": "High",
+          "assignee": "member_mum",
+          "start": "2026-03-08",
+          "due": "2026-03-12",
+          "notes": "Called twice, no response yet"
+        },
+        {
+          "id": 1000303,
+          "name": "Submit application",
+          "status": "Planned",
+          "priority": "High",
+          "assignee": "member_emma",
+          "start": "2026-03-12",
+          "due": "2026-03-12",
+          "notes": "Deadline is today!"
+        }
+      ]
+    },
+    {
+      "id": 1000004,
+      "name": "Garden Spring Cleanup",
+      "desc": "Tidy up garden after winter — lawn, beds, shed",
+      "assignee": "member_dad",
+      "status": "Planned",
+      "priority": "Low",
+      "start": "2026-03-20",
+      "due": "2026-04-05",
+      "notes": "",
+      "subtasks": [
+        {
+          "id": 1000401,
+          "name": "Mow lawn (first cut of the year)",
+          "status": "Planned",
+          "priority": "Medium",
+          "assignee": "member_dad",
+          "start": "2026-03-20",
+          "due": "2026-03-22",
+          "notes": ""
+        },
+        {
+          "id": 1000402,
+          "name": "Clear flower beds",
+          "status": "Planned",
+          "priority": "Low",
+          "assignee": "member_jack",
+          "start": "2026-03-22",
+          "due": "2026-03-25",
+          "notes": ""
+        },
+        {
+          "id": 1000403,
+          "name": "Organise garden shed",
+          "status": "Planned",
+          "priority": "Low",
+          "assignee": "member_dad",
+          "start": "2026-03-25",
+          "due": "2026-03-28",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": 1000005,
+      "name": "Fix Leaky Bathroom Tap",
+      "desc": "Dripping tap in main bathroom needs washer replaced",
+      "assignee": "member_dad",
+      "status": "Planned",
+      "priority": "Medium",
+      "start": "2026-03-12",
+      "due": "2026-03-12",
+      "notes": "Parts already bought",
+      "subtasks": []
+    },
+    {
+      "id": 1773388480497,
+      "name": "Vaske huset",
+      "desc": "",
+      "assignee": null,
+      "start": "2026-03-12",
+      "due": "2026-03-14",
+      "status": "Planned",
+      "priority": "High",
+      "notes": "",
+      "subtasks": []
+    }
+  ]
+}

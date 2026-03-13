@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Project Tracker</title>
+  <style>
+    :root {
+      --planned: #6366f1;
+      --progress: #f59e0b;
+      --completed: #10b981;
+      --blocked: #ef4444;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 20px; background: var(--bg); color: var(--text); }
+    h1 { text-align: center; margin-bottom: 8px; font-weight: 600; }
+    
+    .top-bar { text-align: center; margin-bottom: 20px; }
+    .top-bar select, .top-bar input, .top-bar button { padding: 8px 12px; font-size: 14px; border-radius: 6px; border: 1px solid #cbd5e1; margin: 0 4px; }
+    .top-bar button { background: var(--planned); color: #fff; border: none; cursor: pointer; }
+    .view-tabs { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+    .view-tabs button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; background: #e2e8f0; color: var(--text); }
+    .view-tabs button.active { background: var(--planned); color: #fff; }
+
+    .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .column { background: #e2e8f0; border-radius: 12px; padding: 12px; min-height: 300px; }
+    .column-header { font-weight: 600; padding: 8px 12px; border-radius: 8px; color: #fff; margin-bottom: 12px; text-align: center; }
+    .column[data-status="Planned"] .column-header { background: var(--planned); }
+    .column[data-status="In-progress"] .column-header { background: var(--progress); }
+    .column[data-status="Completed"] .column-header { background: var(--completed); }
+    .column[data-status="Blocked"] .column-header { background: var(--blocked); }
+    .column.drag-over { background: #cbd5e1; }
+    .cards { min-height: 200px; }
+
+    .card { background: var(--card); border-radius: 8px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); cursor: grab; transition: transform 0.15s, box-shadow 0.15s; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .card.dragging { opacity: 0.5; }
+    .card-title { font-weight: 600; margin-bottom: 4px; }
+    .card-meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .card-desc { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .card-progress { font-size: 11px; background: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
+    .card-actions { display: flex; gap: 6px; }
+    .card-actions button { font-size: 11px; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-open { background: #dbeafe; color: #1d4ed8; }
+    .btn-edit { background: #e0e7ff; color: #4338ca; }
+    .btn-del { background: #fee2e2; color: #dc2626; }
+    .priority-High { border-left: 4px solid #ef4444; }
+    .priority-Medium { border-left: 4px solid #f59e0b; }
+    .priority-Low { border-left: 4px solid #10b981; }
+
+    .form-container { background: var(--card); border-radius: 12px; padding: 24px; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .form-container h2 { margin-top: 0; font-weight: 600; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-grid label { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); }
+    .form-grid input, .form-grid select { margin-top: 4px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+    .form-grid input:focus, .form-grid select:focus { outline: none; border-color: var(--planned); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+    .form-full { grid-column: 1 / -1; }
+    .form-actions { margin-top: 16px; display: flex; gap: 10px; }
+    .form-actions button { padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
+    .btn-save { background: var(--planned); color: #fff; }
+    .btn-cancel { background: #e2e8f0; color: var(--text); }
+
+    /* GANTT */
+    .gantt-container { display: none; background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow-x: auto; }
+    .gantt-container.active { display: block; }
+    .gantt-controls { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+    .gantt-controls label { font-size: 13px; color: var(--muted); }
+    .gantt-controls input { padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; }
+    .gantt-controls button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; background: #e2e8f0; }
+    .gantt-hint { font-size: 12px; color: var(--muted); margin-left: auto; }
+    .gantt-wrapper { min-width: 800px; position: relative; }
+    .gantt-header { display: flex; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 8px; }
+    .gantt-header-label { width: 200px; flex-shrink: 0; font-weight: 600; font-size: 13px; }
+    .gantt-header-timeline { flex: 1; display: flex; position: relative; }
+    .gantt-header-day { flex: 1; text-align: center; font-size: 11px; color: var(--muted); border-left: 1px solid #e2e8f0; padding: 2px 0; min-width: 30px; }
+    .gantt-header-day.weekend { background: #f8fafc; }
+    .gantt-header-day.today { background: #dbeafe; font-weight: 600; color: var(--planned); }
+    .gantt-row { display: flex; align-items: center; min-height: 40px; border-bottom: 1px solid #f1f5f9; }
+    .gantt-row:hover { background: #f8fafc; }
+    .gantt-row-label { width: 200px; flex-shrink: 0; padding: 4px 8px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gantt-row-label.subtask { padding-left: 24px; font-size: 12px; color: var(--muted); }
+    .gantt-row-timeline { flex: 1; display: flex; position: relative; height: 32px; }
+    .gantt-cell { flex: 1; border-left: 1px solid #f1f5f9; min-width: 30px; }
+    .gantt-cell.weekend { background: #fafafa; }
+    .gantt-cell.today { background: rgba(99,102,241,0.08); }
+    
+    /* Draggable Gantt Bars */
+    .gantt-bar { 
+      position: absolute; 
+      height: 24px; 
+      top: 4px; 
+      border-radius: 4px; 
+      font-size: 10px; 
+      color: #fff; 
+      display: flex; 
+      align-items: center; 
+      padding: 0 6px; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      cursor: grab;
+      user-select: none;
+      transition: box-shadow 0.15s;
+    }
+    .gantt-bar:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .gantt-bar.dragging { opacity: 0.8; cursor: grabbing; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100; }
+    .gantt-bar.status-Planned { background: var(--planned); }
+    .gantt-bar.status-In-progress { background: var(--progress); }
+    .gantt-bar.status-Completed { background: var(--completed); }
+    .gantt-bar.status-Blocked { background: var(--blocked); }
+    .gantt-bar.subtask-bar { height: 18px; top: 7px; opacity: 0.85; }
+    
+    /* Resize handles */
+    .gantt-bar-handle { 
+      position: absolute; 
+      top: 0; 
+      bottom: 0; 
+      width: 8px; 
+      cursor: ew-resize; 
+      background: rgba(255,255,255,0.3);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .gantt-bar:hover .gantt-bar-handle { opacity: 1; }
+    .gantt-bar-handle.left { left: 0; border-radius: 4px 0 0 4px; }
+    .gantt-bar-handle.right { right: 0; border-radius: 0 4px 4px 0; }
+    
+    .gantt-bar-content { flex: 1; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+    .gantt-today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--planned); z-index: 10; pointer-events: none; }
+    .gantt-empty { text-align: center; padding: 40px; color: var(--muted); }
+
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--card); border-radius: 12px; padding: 24px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; position: relative; }
+    .modal-close { position: absolute; top: 12px; right: 12px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted); }
+    .modal h2 { margin-top: 0; }
+    .modal-meta { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+
+    .subtask-section { margin-top: 24px; }
+    .subtask-section h3 { margin-bottom: 12px; }
+    .subtask-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .subtask-column { background: #f8fafc; border-radius: 8px; padding: 8px; min-height: 120px; }
+    .subtask-column-header { font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 4px; color: #fff; margin-bottom: 8px; text-align: center; }
+    .subtask-column[data-status="Planned"] .subtask-column-header { background: var(--planned); }
+    .subtask-column[data-status="In-progress"] .subtask-column-header { background: var(--progress); }
+    .subtask-column[data-status="Completed"] .subtask-column-header { background: var(--completed); }
+    .subtask-column[data-status="Blocked"] .subtask-column-header { background: var(--blocked); }
+    .subtask-column.drag-over { background: #e2e8f0; }
+    .subtask-cards { min-height: 60px; }
+    .subtask-card { background: #fff; border-radius: 6px; padding: 8px; margin-bottom: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); cursor: grab; font-size: 13px; }
+    .subtask-card.dragging { opacity: 0.5; }
+    .subtask-card-title { font-weight: 500; margin-bottom: 4px; }
+    .subtask-card-meta { font-size: 11px; color: var(--muted); }
+    .subtask-card-actions { margin-top: 6px; display: flex; gap: 4px; }
+    .subtask-card-actions button { font-size: 10px; padding: 2px 6px; border: none; border-radius: 3px; cursor: pointer; }
+
+    .subtask-form { margin-top: 16px; padding: 16px; background: #f8fafc; border-radius: 8px; }
+    .subtask-form h4 { margin-top: 0; margin-bottom: 12px; }
+    .subtask-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .subtask-form-grid label { display: flex; flex-direction: column; font-size: 12px; color: var(--muted); }
+    .subtask-form-grid input, .subtask-form-grid select { margin-top: 2px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; }
+    .subtask-form-actions { margin-top: 12px; display: flex; gap: 8px; }
+    .subtask-form-actions button { padding: 8px 16px; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; }
+
+    @media (max-width: 800px) { .board, .subtask-board { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 500px) { .board, .subtask-board { grid-template-columns: 1fr; } .form-grid, .subtask-form-grid { grid-template-columns: 1fr; } }
+
+    /* LOCK IN MODE */
+    .lockin-container { display: none; max-width: 640px; margin: 0 auto 32px; }
+    .lockin-container.active { display: block; }
+    .lockin-header { text-align: center; margin-bottom: 24px; }
+    .lockin-header h2 { font-size: 22px; margin: 0 0 4px; }
+    .lockin-header p { color: var(--muted); font-size: 14px; margin: 0; }
+    .lockin-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 16px; }
+    .lockin-empty span { font-size: 48px; display: block; margin-bottom: 12px; }
+
+    .lockin-task {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.2s, opacity 0.3s, box-shadow 0.2s;
+    }
+    .lockin-task:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: translateY(-1px); }
+    .lockin-task.completing { opacity: 0; transform: translateX(60px) scale(0.95); }
+    .lockin-task.priority-High { border-left: 5px solid #ef4444; }
+    .lockin-task.priority-Medium { border-left: 5px solid #f59e0b; }
+    .lockin-task.priority-Low { border-left: 5px solid #10b981; }
+    .lockin-task.overdue .lockin-due { color: #ef4444; font-weight: 600; }
+
+    .lockin-check {
+      width: 28px; height: 28px; flex-shrink: 0;
+      border: 2px solid #cbd5e1; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; transition: all 0.2s; background: transparent;
+    }
+    .lockin-check:hover { border-color: #10b981; background: #d1fae5; }
+
+    .lockin-task-body { flex: 1; min-width: 0; }
+    .lockin-task-name { font-weight: 600; font-size: 15px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lockin-task-meta { font-size: 12px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .lockin-project-tag { background: #e0e7ff; color: #4338ca; padding: 1px 7px; border-radius: 10px; font-size: 11px; }
+    .lockin-subtask-tag { background: #f3e8ff; color: #7c3aed; padding: 1px 7px; border-radius: 10px; font-size: 11px; }
+
+    .lockin-prio-badge { flex-shrink: 0; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+    .lockin-prio-badge.High { background: #fee2e2; color: #dc2626; }
+    .lockin-prio-badge.Medium { background: #fef3c7; color: #d97706; }
+    .lockin-prio-badge.Low { background: #d1fae5; color: #059669; }
+
+    .lockin-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 20px 0 8px 4px; }
+
+    /* POMODORO TIMER */
+    .pomo-widget {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px 20px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      text-align: center;
+      position: relative;
+    }
+    .pomo-mode-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px;
+    }
+    .pomo-mode-label.break { color: #10b981; }
+
+    .pomo-ring-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 12px; }
+    .pomo-ring { transform: rotate(-90deg); }
+    .pomo-ring-bg { fill: none; stroke: #e2e8f0; stroke-width: 8; }
+    .pomo-ring-progress { fill: none; stroke: var(--planned); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+    .pomo-ring-progress.break { stroke: #10b981; }
+    .pomo-time {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 32px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums;
+    }
+
+    .pomo-task-name {
+      font-size: 14px; font-weight: 600; color: var(--text);
+      margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 400px; margin: 0 auto 4px;
+    }
+    .pomo-task-none { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+
+    .pomo-sessions { margin: 8px 0 16px; font-size: 18px; letter-spacing: 3px; min-height: 24px; }
+
+    .pomo-controls { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .pomo-btn {
+      padding: 8px 18px; border: none; border-radius: 8px; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.1s;
+    }
+    .pomo-btn:active { transform: scale(0.96); }
+    .pomo-btn.start  { background: var(--planned); color: #fff; }
+    .pomo-btn.pause  { background: #fef3c7; color: #d97706; }
+    .pomo-btn.resume { background: #d1fae5; color: #059669; }
+    .pomo-btn.skip   { background: #e2e8f0; color: var(--text); }
+    .pomo-btn.stop   { background: #fee2e2; color: #dc2626; }
+
+    .pomo-settings-btn {
+      position: absolute; top: 12px; right: 14px;
+      background: none; border: none; cursor: pointer; font-size: 18px; color: var(--muted);
+    }
+    .pomo-settings-panel {
+      display: none; margin-top: 16px; padding-top: 16px;
+      border-top: 1px solid #e2e8f0; text-align: left;
+    }
+    .pomo-settings-panel.open { display: block; }
+    .pomo-settings-panel label { font-size: 13px; color: var(--muted); display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .pomo-settings-panel input { width: 60px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; text-align: center; }
+
+    .lockin-task.pomo-active {
+      box-shadow: 0 0 0 3px var(--planned), 0 4px 16px rgba(99,102,241,0.2);
+      animation: pomo-pulse 2s ease-in-out infinite;
+    }
+    .lockin-task.pomo-active.break-active {
+      box-shadow: 0 0 0 3px #10b981, 0 4px 16px rgba(16,185,129,0.2);
+      animation: pomo-pulse-green 2s ease-in-out infinite;
+    }
+    @keyframes pomo-pulse {
+      0%, 100% { box-shadow: 0 0 0 3px var(--planned), 0 4px 16px rgba(99,102,241,0.2); }
+      50% { box-shadow: 0 0 0 6px rgba(99,102,241,0.3), 0 4px 20px rgba(99,102,241,0.3); }
+    }
+    @keyframes pomo-pulse-green {
+      0%, 100% { box-shadow: 0 0 0 3px #10b981, 0 4px 16px rgba(16,185,129,0.2); }
+      50% { box-shadow: 0 0 0 6px rgba(16,185,129,0.3), 0 4px 20px rgba(16,185,129,0.3); }
+    }
+
+    .lockin-start-pomo {
+      flex-shrink: 0; padding: 5px 10px; border: none; border-radius: 6px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      background: #e0e7ff; color: #4338ca; transition: background 0.15s;
+    }
+    .lockin-start-pomo:hover { background: var(--planned); color: #fff; }
+    .lockin-start-pomo.active { background: var(--planned); color: #fff; }
+
+    /* FAMILY MEMBERS */
+    .members-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; padding: 12px 16px; background: var(--card); border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .members-bar-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-right: 4px; }
+    .member-filter-btn { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border: 2px solid transparent; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; background: #f1f5f9; color: var(--text); transition: all 0.15s; }
+    .member-filter-btn:hover { background: #e2e8f0; }
+    .member-filter-btn.active { border-color: currentColor; background: #fff; }
+    .member-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .member-filter-btn.all-btn { color: var(--planned); }
+    .member-filter-btn.all-btn.active { background: #e0e7ff; }
+    .members-manage-btn { margin-left: auto; padding: 4px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; cursor: pointer; color: var(--muted); }
+    .members-manage-btn:hover { background: #f8fafc; }
+    .member-avatar { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .member-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 1px 6px 1px 3px; border-radius: 10px; color: #fff; font-weight: 600; }
+
+    /* Members modal */
+    .members-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; justify-content: center; align-items: center; }
+    .members-modal-overlay.open { display: flex; }
+    .members-modal { background: var(--card); border-radius: 12px; padding: 24px; width: 90%; max-width: 420px; position: relative; }
+    .members-modal h3 { margin: 0 0 16px; }
+    .members-list { margin-bottom: 16px; }
+    .member-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+    .member-row:last-child { border-bottom: none; }
+    .member-row-name { flex: 1; font-size: 14px; font-weight: 500; }
+    .member-row-del { background: #fee2e2; color: #dc2626; border: none; border-radius: 4px; padding: 3px 8px; font-size: 12px; cursor: pointer; }
+    .member-add-form { display: flex; gap: 8px; margin-top: 8px; }
+    .member-add-form input { flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+    .member-add-form button { padding: 8px 14px; background: var(--planned); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>📋 Family Project Tracker</h1>
+
+  <div class="top-bar">
+    <select id="familySelect"><option value="">-- Select Family --</option></select>
+    <input type="text" id="newFamilyInput" placeholder="New family name..."/>
+    <button onclick="createFamily()">+ Create</button>
+    <div class="view-tabs">
+      <button id="tabBoard" class="active" onclick="switchView('board')">📋 Board</button>
+      <button id="tabGantt" onclick="switchView('gantt')">📊 Gantt</button>
+      <button id="tabLockin" onclick="switchView('lockin')">🔒 Lock In</button>
+    </div>
+  </div>
+
+  <div class="lockin-container" id="lockinView"></div>
+
+  <div id="membersBar" style="display:none"></div>
+
+  <div class="board" id="boardView"></div>
+
+  <div class="gantt-container" id="ganttView">
+    <div class="gantt-controls">
+      <label>From: <input type="date" id="ganttStart"/></label>
+      <label>To: <input type="date" id="ganttEnd"/></label>
+      <button onclick="renderGantt()">Update</button>
+      <label><input type="checkbox" id="showSubtasks" checked/> Show subtasks</label>
+      <span class="gantt-hint">💡 Drag bars to move · Drag edges to resize</span>
+    </div>
+    <div class="gantt-wrapper" id="ganttChart"></div>
+  </div>
+
+  <div class="form-container">
+    <h2 id="formTitle">Add Project</h2>
+    <form id="projForm">
+      <input type="hidden" id="projId"/>
+      <div class="form-grid">
+        <label class="form-full">Name <input type="text" id="projName" required/></label>
+        <label class="form-full">Description <input type="text" id="projDesc"/></label>
+        <label>Assignee <select id="projAssignee"><option value="">Unassigned</option></select></label>
+        <label>Priority <select id="projPriority"><option value="High">🔴 High</option><option value="Medium" selected>🟡 Medium</option><option value="Low">🟢 Low</option></select></label>
+        <label>Start <input type="date" id="projStart"/></label>
+        <label>Due <input type="date" id="projDue"/></label>
+        <label>Status <select id="projStatus"><option value="Planned">Planned</option><option value="In-progress">In Progress</option><option value="Completed">Completed</option><option value="Blocked">Blocked</option></select></label>
+        <label>Notes <input type="text" id="projNotes"/></label>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Save Project</button>
+        <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h2 id="modalTitle">Project Details</h2>
+      <div class="modal-meta" id="modalMeta"></div>
+      <div class="subtask-section">
+        <h3>Subtasks</h3>
+        <div class="subtask-board">
+          <div class="subtask-column" data-status="Planned"><div class="subtask-column-header">📝 Planned</div><div class="subtask-cards"></div></div>
+          <div class="subtask-column" data-status="In-progress"><div class="subtask-column-header">🚧 In Progress</div><div class="subtask-cards"></div></div>
+          <div class="subtask-column" data-status="Completed"><div class="subtask-column-header">✅ Completed</div><div class="subtask-cards"></div></div>
+          <div class="subtask-column" data-status="Blocked"><div class="subtask-column-header">🚫 Blocked</div><div class="subtask-cards"></div></div>
+        </div>
+        <div class="subtask-form">
+          <h4 id="subtaskFormTitle">Add Subtask</h4>
+          <input type="hidden" id="subtaskId"/>
+          <div class="subtask-form-grid">
+            <label class="form-full">Name <input type="text" id="subtaskName" required/></label>
+            <label>Assignee <select id="subtaskAssignee"><option value="">Unassigned</option></select></label>
+            <label>Priority <select id="subtaskPriority"><option value="High">🔴 High</option><option value="Medium" selected>🟡 Medium</option><option value="Low">🟢 Low</option></select></label>
+            <label>Status <select id="subtaskStatus"><option value="Planned">Planned</option><option value="In-progress">In Progress</option><option value="Completed">Completed</option><option value="Blocked">Blocked</option></select></label>
+            <label>Due <input type="date" id="subtaskDue"/></label>
+            <label>Notes <input type="text" id="subtaskNotes"/></label>
+          </div>
+          <div class="subtask-form-actions">
+            <button type="button" class="btn-save" onclick="saveSubtask()">Save Subtask</button>
+            <button type="button" class="btn-cancel" onclick="clearSubtaskForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Members Modal -->
+  <div class="members-modal-overlay" id="membersModal">
+    <div class="members-modal">
+      <button class="modal-close" id="closeMembersModalBtn">&times;</button>
+      <h3>👥 Family Members</h3>
+      <div class="members-list" id="membersModalList"></div>
+      <div class="member-add-form">
+        <input type="text" id="newMemberName" placeholder="Add member name..."/>
+        <button id="addMemberBtn">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const API = '/api';
+  let currentFamily = null;
+  let projects = [];
+  let currentProjectId = null;
+  let currentView = 'board';
+  let filterMemberId = null; // null = All
+
+  // Member colour palette
+  const MEMBER_COLOURS = [
+    '#6366f1','#f59e0b','#10b981','#ef4444','#3b82f6',
+    '#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16'
+  ];
+
+  function getMemberColour(index) {
+    return MEMBER_COLOURS[index % MEMBER_COLOURS.length];
+  }
+
+  function getMembers() {
+    const fam = getCurrentFamilyData();
+    return fam ? (fam.members || []) : [];
+  }
+
+  function getCurrentFamilyData() {
+    // We keep a local cache of family data including members
+    return window._familyData || null;
+  }
+
+  async function loadFamilyData(id) {
+    const data = await api.get(`/family/${id}`);
+    window._familyData = data;
+    return data;
+  }
+
+  function memberById(id) {
+    return getMembers().find(m => m.id === id);
+  }
+
+  function memberAvatarHtml(memberId, size = 22) {
+    const m = memberById(memberId);
+    if (!m) return '';
+    const initials = m.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    return `<span class="member-avatar" style="background:${m.color};width:${size}px;height:${size}px;font-size:${Math.floor(size*0.45)}px">${initials}</span>`;
+  }
+
+  function memberTagHtml(memberId) {
+    const m = memberById(memberId);
+    if (!m) return '';
+    const initials = m.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    return `<span class="member-tag" style="background:${m.color}">${memberAvatarHtml(memberId, 16)} ${m.name}</span>`;
+  }
+
+  function renderMembersBar() {
+    const bar = document.getElementById('membersBar');
+    const members = getMembers();
+    if (!currentFamily) { bar.style.display = 'none'; return; }
+    bar.style.display = 'flex';
+    bar.className = 'members-bar';
+
+    let html = `<button class="member-filter-btn all-btn${filterMemberId === null ? ' active' : ''}" data-filter="__all__">
+        👥 All
+      </button>`;
+
+    members.forEach(m => {
+      const isActive = filterMemberId === m.id;
+      html += `<button class="member-filter-btn${isActive ? ' active' : ''}" style="color:${m.color}" data-filter="${m.id}">
+        <span class="member-dot" style="background:${m.color}"></span>${m.name}
+      </button>`;
+    });
+
+    html += `<button class="members-manage-btn" id="manageMembersBtn">✏️ Manage</button>`;
+    bar.innerHTML = html;
+
+    // Attach event listeners directly — avoids inline onclick scope issues
+    bar.querySelectorAll('[data-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.filter;
+        setMemberFilter(val === '__all__' ? null : val);
+      });
+    });
+    const manageBtn = document.getElementById('manageMembersBtn');
+    if (manageBtn) manageBtn.addEventListener('click', openMembersModal);
+  }
+
+  function setMemberFilter(id) {
+    filterMemberId = id;
+    if (id) localStorage.setItem('filterMember_' + currentFamily, id);
+    else localStorage.removeItem('filterMember_' + currentFamily);
+    renderMembersBar();
+    render();
+    if (currentView === 'lockin') renderLockin();
+  }
+
+  // Members modal
+  function openMembersModal() {
+    renderMembersModalList();
+    const el = document.getElementById('membersModal');
+    if (el) el.classList.add('open');
+  }
+
+  function closeMembersModal() {
+    const el = document.getElementById('membersModal');
+    if (el) el.classList.remove('open');
+  }
+  window.openMembersModal = openMembersModal;
+  window.closeMembersModal = closeMembersModal;
+  window.addMember = addMember;
+  window.deleteMember = deleteMember;
+  window.setMemberFilter = setMemberFilter;
+
+  function renderMembersModalList() {
+    const members = getMembers();
+    const list = document.getElementById('membersModalList');
+    if (members.length === 0) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0">No members yet — add one below.</div>';
+      return;
+    }
+    list.innerHTML = members.map(m => `
+      <div class="member-row">
+        ${memberAvatarHtml(m.id, 28)}
+        <span class="member-row-name">${m.name}</span>
+        <button class="member-row-del" data-del-id="${m.id}">Remove</button>
+      </div>`).join('');
+    list.querySelectorAll('[data-del-id]').forEach(btn => {
+      btn.addEventListener('click', () => deleteMember(btn.dataset.delId));
+    });
+  }
+
+  async function addMember() {
+    const input = document.getElementById('newMemberName');
+    const name = input.value.trim();
+    if (!name) return;
+    const fam = getCurrentFamilyData();
+    if (!fam) return;
+    if (!fam.members) fam.members = [];
+    const id = 'member_' + Date.now();
+    const color = getMemberColour(fam.members.length);
+    fam.members.push({ id, name, color });
+    await api.post(`/family/${currentFamily}/members`, fam.members);
+    window._familyData = fam;
+    input.value = '';
+    renderMembersModalList();
+    renderMembersBar();
+    renderAssigneeDropdown();
+  }
+
+  async function deleteMember(id) {
+    const fam = getCurrentFamilyData();
+    if (!fam) return;
+    fam.members = (fam.members || []).filter(m => m.id !== id);
+    await api.post(`/family/${currentFamily}/members`, fam.members);
+    window._familyData = fam;
+    if (filterMemberId === id) setMemberFilter(null);
+    renderMembersModalList();
+    renderMembersBar();
+    renderAssigneeDropdown();
+    render();
+  }
+
+  function renderAssigneeDropdown() {
+    const sel = document.getElementById('projAssignee');
+    if (!sel) return;
+    const members = getMembers();
+    sel.innerHTML = '<option value="">Unassigned</option>' +
+      members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  }
+
+  function renderSubtaskAssigneeDropdown() {
+    const sel = document.getElementById('subtaskAssignee');
+    if (!sel) return;
+    const members = getMembers();
+    sel.innerHTML = '<option value="">Unassigned</option>' +
+      members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  }
+
+  // Gantt drag state
+  let ganttDrag = null;
+  let ganttStartDate = null;
+  let ganttEndDate = null;
+  let ganttDays = [];
+
+  const api = {
+    get: url => fetch(API + url).then(r => r.json()),
+    post: (url, body) => fetch(API + url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json()),
+    del: url => fetch(API + url, { method: 'DELETE' }).then(r => r.json())
+  };
+
+  function switchView(view) {
+    currentView = view;
+    document.getElementById('tabBoard').classList.toggle('active', view === 'board');
+    document.getElementById('tabGantt').classList.toggle('active', view === 'gantt');
+    document.getElementById('tabLockin').classList.toggle('active', view === 'lockin');
+    document.getElementById('boardView').style.display = view === 'board' ? 'grid' : 'none';
+    document.getElementById('ganttView').classList.toggle('active', view === 'gantt');
+    document.getElementById('lockinView').classList.toggle('active', view === 'lockin');
+    if (view === 'gantt') renderGantt();
+    if (view === 'lockin') renderLockin();
+  }
+
+  async function loadFamilies() {
+    const families = await api.get('/families');
+    const sel = document.getElementById('familySelect');
+    sel.innerHTML = '<option value="">-- Select Family --</option>';
+    families.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = f.name;
+      sel.appendChild(opt);
+    });
+    const saved = localStorage.getItem('currentFamily');
+    if (saved && families.find(f => f.id === saved)) {
+      sel.value = saved;
+      selectFamily(saved);
+    }
+  }
+
+  async function selectFamily(id) {
+    if (!id) { projects = []; window._familyData = null; filterMemberId = null; renderMembersBar(); render(); return; }
+    currentFamily = id;
+    localStorage.setItem('currentFamily', id);
+    await loadFamilyData(id);
+    projects = getCurrentFamilyData().projects || [];
+    filterMemberId = localStorage.getItem('filterMember_' + id) || null;
+    renderMembersBar();
+    renderAssigneeDropdown();
+    renderSubtaskAssigneeDropdown();
+    render();
+    if (currentView === 'gantt') renderGantt();
+    if (currentView === 'lockin') renderLockin();
+  }
+
+  async function createFamily() {
+    const name = document.getElementById('newFamilyInput').value.trim();
+    if (!name) return alert('Enter a family name');
+    const id = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    await api.post('/family', { id, name });
+    document.getElementById('newFamilyInput').value = '';
+    await loadFamilies();
+    document.getElementById('familySelect').value = id;
+    selectFamily(id);
+  }
+
+  document.getElementById('familySelect').addEventListener('change', e => selectFamily(e.target.value));
+
+  function render() {
+    // Rebuild columns dynamically to support drag listeners
+    const boardEl = document.getElementById('boardView');
+    boardEl.innerHTML = `
+      <div class="column" data-status="Planned"><div class="column-header">📝 Planned</div><div class="cards"></div></div>
+      <div class="column" data-status="In-progress"><div class="column-header">🚧 In Progress</div><div class="cards"></div></div>
+      <div class="column" data-status="Completed"><div class="column-header">✅ Completed</div><div class="cards"></div></div>
+      <div class="column" data-status="Blocked"><div class="column-header">🚫 Blocked</div><div class="cards"></div></div>`;
+    addColumnDragListeners();
+
+    const visibleProjects = filterMemberId
+      ? projects.filter(p => p.assignee === filterMemberId ||
+          (p.subtasks || []).some(s => s.assignee === filterMemberId))
+      : projects;
+
+    visibleProjects.forEach(p => {
+      const col = document.querySelector(`.column[data-status="${p.status}"] .cards`);
+      if (!col) return;
+      const subtasks = p.subtasks || [];
+      const done = subtasks.filter(s => s.status === 'Completed').length;
+      const total = subtasks.length;
+      const card = document.createElement('div');
+      card.className = `card priority-${p.priority}`;
+      card.draggable = true;
+      card.dataset.id = p.id;
+      card.innerHTML = `
+        <div class="card-title">${p.name}</div>
+        <div class="card-meta">${p.assignee ? memberTagHtml(p.assignee) : '<span style="color:var(--muted);font-size:12px">Unassigned</span>'} · Due: ${p.due || '—'}</div>
+        ${p.desc ? `<div class="card-desc">${p.desc}</div>` : ''}
+        ${total > 0 ? `<div class="card-progress">Subtasks: ${done}/${total}</div>` : ''}
+        <div class="card-actions">
+          <button class="btn-open" onclick="openModal(${p.id})">Open</button>
+          <button class="btn-edit" onclick="editForm(${p.id})">Edit</button>
+          <button class="btn-del" onclick="delProject(${p.id})">Del</button>
+        </div>`;
+      col.appendChild(card);
+    });
+    addDragListeners();
+  }
+
+  function addColumnDragListeners() {
+    document.querySelectorAll('.column').forEach(col => {
+      col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+      col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+      col.addEventListener('drop', async e => {
+        e.preventDefault();
+        col.classList.remove('drag-over');
+        if (e.dataTransfer.getData('type') !== 'project') return;
+        const id = Number(e.dataTransfer.getData('text/plain'));
+        const proj = projects.find(p => p.id === id);
+        if (proj) {
+          proj.status = col.dataset.status;
+          await api.post(`/family/${currentFamily}/projects`, proj);
+          render();
+        }
+      });
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // GANTT CHART WITH DRAG & RESIZE
+  // ═══════════════════════════════════════════════════════════
+  function initGanttDates() {
+    const today = new Date();
+    const start = new Date(today);
+    start.setDate(start.getDate() - 7);
+    const end = new Date(today);
+    end.setDate(end.getDate() + 21);
+    document.getElementById('ganttStart').value = start.toISOString().split('T')[0];
+    document.getElementById('ganttEnd').value = end.toISOString().split('T')[0];
+  }
+
+  function renderGantt() {
+    const container = document.getElementById('ganttChart');
+    const startStr = document.getElementById('ganttStart').value;
+    const endStr = document.getElementById('ganttEnd').value;
+    const showSubs = document.getElementById('showSubtasks').checked;
+
+    if (!startStr || !endStr) { initGanttDates(); return renderGantt(); }
+
+    ganttStartDate = new Date(startStr);
+    ganttEndDate = new Date(endStr);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    ganttDays = [];
+    for (let d = new Date(ganttStartDate); d <= ganttEndDate; d.setDate(d.getDate() + 1)) {
+      ganttDays.push(new Date(d));
+    }
+
+    if (ganttDays.length === 0 || projects.length === 0) {
+      container.innerHTML = '<div class="gantt-empty">No projects or invalid date range</div>';
+      return;
+    }
+
+    // Header
+    let html = `<div class="gantt-header">
+      <div class="gantt-header-label">Task</div>
+      <div class="gantt-header-timeline">`;
+    ganttDays.forEach(d => {
+      const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+      const isToday = d.toDateString() === today.toDateString();
+      const cls = [isWeekend ? 'weekend' : '', isToday ? 'today' : ''].filter(Boolean).join(' ');
+      const label = `${d.getDate()}/${d.getMonth()+1}`;
+      html += `<div class="gantt-header-day ${cls}">${label}</div>`;
+    });
+    html += '</div></div>';
+
+    // Rows
+    projects.forEach(p => {
+      html += renderGanttRow(p, today, false);
+      if (showSubs && p.subtasks) {
+        p.subtasks.forEach(s => {
+          html += renderGanttRow(s, today, true, p.id);
+        });
+      }
+    });
+
+    container.innerHTML = html;
+    attachGanttDragListeners();
+  }
+
+  function renderGanttRow(item, today, isSubtask, parentId) {
+    const pStart = item.start ? new Date(item.start) : null;
+    const pEnd = item.due ? new Date(item.due) : pStart;
+    const totalDays = ganttDays.length;
+
+    let barHtml = '';
+    if (pStart && pEnd && totalDays > 0) {
+      const msPerDay = 1000*60*60*24;
+      const barStartDay = (pStart - ganttStartDate) / msPerDay;
+      const barEndDay = (pEnd - ganttStartDate) / msPerDay + 1;
+      const clampedStart = Math.max(0, barStartDay);
+      const clampedEnd = Math.min(totalDays, barEndDay);
+      const barLength = clampedEnd - clampedStart;
+
+      if (barLength > 0 && clampedStart < totalDays) {
+        const left = (clampedStart / totalDays) * 100;
+        const width = (barLength / totalDays) * 100;
+        const statusClass = `status-${item.status}`;
+        const subClass = isSubtask ? 'subtask-bar' : '';
+        const dataAttrs = isSubtask 
+          ? `data-subtask-id="${item.id}" data-parent-id="${parentId}"`
+          : `data-project-id="${item.id}"`;
+        
+        barHtml = `
+          <div class="gantt-bar ${statusClass} ${subClass}" ${dataAttrs} style="left:${left}%;width:${width}%;">
+            <div class="gantt-bar-handle left"></div>
+            <div class="gantt-bar-content">${item.name}</div>
+            <div class="gantt-bar-handle right"></div>
+          </div>`;
+      }
+    }
+
+    // Today line
+    let todayLine = '';
+    if (today >= ganttStartDate && today <= ganttEndDate && totalDays > 0) {
+      const todayPos = (today - ganttStartDate) / (1000*60*60*24);
+      const todayLeft = (todayPos / totalDays) * 100;
+      todayLine = `<div class="gantt-today-line" style="left:${todayLeft}%;"></div>`;
+    }
+
+    // Cells
+    let cellsHtml = '';
+    ganttDays.forEach(d => {
+      const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+      const isToday = d.toDateString() === today.toDateString();
+      const cls = [isWeekend ? 'weekend' : '', isToday ? 'today' : ''].filter(Boolean).join(' ');
+      cellsHtml += `<div class="gantt-cell ${cls}"></div>`;
+    });
+
+    const labelClass = isSubtask ? 'subtask' : '';
+    const onclick = isSubtask ? '' : `onclick="openModal(${item.id})"`;
+
+    return `<div class="gantt-row">
+      <div class="gantt-row-label ${labelClass}" ${onclick} style="cursor:${isSubtask?'default':'pointer'}">${item.name}</div>
+      <div class="gantt-row-timeline">${cellsHtml}${barHtml}${todayLine}</div>
+    </div>`;
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // GANTT DRAG & RESIZE HANDLERS
+  // ═══════════════════════════════════════════════════════════
+  function attachGanttDragListeners() {
+    document.querySelectorAll('.gantt-bar').forEach(bar => {
+      bar.addEventListener('mousedown', onGanttMouseDown);
+    });
+  }
+
+  function onGanttMouseDown(e) {
+    const bar = e.target.closest('.gantt-bar');
+    if (!bar) return;
+
+    const timeline = bar.closest('.gantt-row-timeline');
+    const rect = timeline.getBoundingClientRect();
+    const barRect = bar.getBoundingClientRect();
+
+    const isLeftHandle = e.target.classList.contains('left');
+    const isRightHandle = e.target.classList.contains('right');
+    const mode = isLeftHandle ? 'resize-left' : isRightHandle ? 'resize-right' : 'move';
+
+    const projectId = bar.dataset.projectId ? Number(bar.dataset.projectId) : null;
+    const subtaskId = bar.dataset.subtaskId ? Number(bar.dataset.subtaskId) : null;
+    const parentId = bar.dataset.parentId ? Number(bar.dataset.parentId) : null;
+
+    ganttDrag = {
+      bar,
+      timeline,
+      timelineRect: rect,
+      mode,
+      startX: e.clientX,
+      origLeft: parseFloat(bar.style.left),
+      origWidth: parseFloat(bar.style.width),
+      projectId,
+      subtaskId,
+      parentId
+    };
+
+    bar.classList.add('dragging');
+    document.addEventListener('mousemove', onGanttMouseMove);
+    document.addEventListener('mouseup', onGanttMouseUp);
+    e.preventDefault();
+  }
+
+  function onGanttMouseMove(e) {
+    if (!ganttDrag) return;
+
+    const { bar, timelineRect, mode, startX, origLeft, origWidth } = ganttDrag;
+    const deltaX = e.clientX - startX;
+    const deltaPercent = (deltaX / timelineRect.width) * 100;
+
+    if (mode === 'move') {
+      let newLeft = origLeft + deltaPercent;
+      newLeft = Math.max(0, Math.min(100 - origWidth, newLeft));
+      bar.style.left = `${newLeft}%`;
+    } else if (mode === 'resize-left') {
+      let newLeft = origLeft + deltaPercent;
+      let newWidth = origWidth - deltaPercent;
+      if (newLeft < 0) { newWidth += newLeft; newLeft = 0; }
+      if (newWidth < 2) { newLeft = origLeft + origWidth - 2; newWidth = 2; }
+      bar.style.left = `${newLeft}%`;
+      bar.style.width = `${newWidth}%`;
+    } else if (mode === 'resize-right') {
+      let newWidth = origWidth + deltaPercent;
+      if (origLeft + newWidth > 100) newWidth = 100 - origLeft;
+      if (newWidth < 2) newWidth = 2;
+      bar.style.width = `${newWidth}%`;
+    }
+  }
+
+  async function onGanttMouseUp(e) {
+    if (!ganttDrag) return;
+
+    const { bar, mode, projectId, subtaskId, parentId } = ganttDrag;
+    bar.classList.remove('dragging');
+
+    const newLeft = parseFloat(bar.style.left);
+    const newWidth = parseFloat(bar.style.width);
+
+    // Calculate new dates
+    const totalDays = ganttDays.length;
+    const startDayIndex = Math.round((newLeft / 100) * totalDays);
+    const endDayIndex = Math.round(((newLeft + newWidth) / 100) * totalDays) - 1;
+
+    const newStartDate = new Date(ganttStartDate);
+    newStartDate.setDate(newStartDate.getDate() + startDayIndex);
+    const newEndDate = new Date(ganttStartDate);
+    newEndDate.setDate(newEndDate.getDate() + endDayIndex);
+
+    const startStr = newStartDate.toISOString().split('T')[0];
+    const endStr = newEndDate.toISOString().split('T')[0];
+
+    // Update project or subtask
+    if (projectId !== null) {
+      const proj = projects.find(p => p.id === projectId);
+      if (proj) {
+        proj.start = startStr;
+        proj.due = endStr;
+        await api.post(`/family/${currentFamily}/projects`, proj);
+        projects = await api.get(`/family/${currentFamily}/projects`);
+      }
+    } else if (subtaskId !== null && parentId !== null) {
+      const proj = projects.find(p => p.id === parentId);
+      if (proj) {
+        const sub = (proj.subtasks || []).find(s => s.id === subtaskId);
+        if (sub) {
+          sub.start = startStr;
+          sub.due = endStr;
+          await api.post(`/family/${currentFamily}/projects`, proj);
+          projects = await api.get(`/family/${currentFamily}/projects`);
+        }
+      }
+    }
+
+    document.removeEventListener('mousemove', onGanttMouseMove);
+    document.removeEventListener('mouseup', onGanttMouseUp);
+    ganttDrag = null;
+
+    render();
+    renderGantt();
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // BOARD DRAG & DROP
+  // ═══════════════════════════════════════════════════════════
+  function addDragListeners() {
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('dragstart', e => {
+        card.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', card.dataset.id);
+        e.dataTransfer.setData('type', 'project');
+      });
+      card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    });
+  }
+
+  document.querySelectorAll('.column').forEach(col => {
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+    col.addEventListener('drop', async e => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      if (e.dataTransfer.getData('type') !== 'project') return;
+      const id = Number(e.dataTransfer.getData('text/plain'));
+      const proj = projects.find(p => p.id === id);
+      if (proj) {
+        proj.status = col.dataset.status;
+        await api.post(`/family/${currentFamily}/projects`, proj);
+        render();
+      }
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════
+  // PROJECT FORM
+  // ═══════════════════════════════════════════════════════════
+  function newId() { return Date.now(); }
+
+  async function saveForm(e) {
+    e.preventDefault();
+    if (!currentFamily) return alert('Select a family first');
+    const id = document.getElementById('projId').value;
+    const existing = id ? projects.find(p => p.id == id) : null;
+    const project = {
+      id: id ? Number(id) : newId(),
+      name: document.getElementById('projName').value,
+      desc: document.getElementById('projDesc').value,
+      assignee: document.getElementById('projAssignee').value || null,
+      start: document.getElementById('projStart').value,
+      due: document.getElementById('projDue').value,
+      status: document.getElementById('projStatus').value,
+      priority: document.getElementById('projPriority').value,
+      notes: document.getElementById('projNotes').value,
+      subtasks: existing ? existing.subtasks || [] : []
+    };
+    await api.post(`/family/${currentFamily}/projects`, project);
+    projects = await api.get(`/family/${currentFamily}/projects`);
+    render();
+    if (currentView === 'gantt') renderGantt();
+    clearForm();
+  }
+
+  function editForm(id) {
+    const p = projects.find(item => item.id === id);
+    if (!p) return;
+    document.getElementById('formTitle').textContent = 'Edit Project';
+    document.getElementById('projId').value = p.id;
+    document.getElementById('projName').value = p.name;
+    document.getElementById('projDesc').value = p.desc || '';
+    document.getElementById('projAssignee').value = p.assignee || '';
+    document.getElementById('projStart').value = p.start || '';
+    document.getElementById('projDue').value = p.due || '';
+    document.getElementById('projStatus').value = p.status;
+    document.getElementById('projPriority').value = p.priority;
+    document.getElementById('projNotes').value = p.notes || '';
+    document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  async function delProject(id) {
+    if (!confirm('Delete this project?')) return;
+    await api.del(`/family/${currentFamily}/projects/${id}`);
+    projects = await api.get(`/family/${currentFamily}/projects`);
+    render();
+    if (currentView === 'gantt') renderGantt();
+  }
+
+  function clearForm() {
+    document.getElementById('formTitle').textContent = 'Add Project';
+    ['projId','projName','projDesc','projStart','projDue','projNotes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('projAssignee').value = '';
+    document.getElementById('projStatus').value = 'Planned';
+    document.getElementById('projPriority').value = 'Medium';
+  }
+
+  document.getElementById('projForm').addEventListener('submit', saveForm);
+  document.getElementById('cancelBtn').addEventListener('click', clearForm);
+
+  // ═══════════════════════════════════════════════════════════
+  // MODAL & SUBTASKS
+  // ═══════════════════════════════════════════════════════════
+  function openModal(id) {
+    currentProjectId = id;
+    const p = projects.find(item => item.id === id);
+    if (!p) return;
+    document.getElementById('modalTitle').textContent = p.name;
+    const assigneeHtml = p.assignee ? memberTagHtml(p.assignee) : '<span style="color:var(--muted)">Unassigned</span>';
+    document.getElementById('modalMeta').innerHTML = `
+      <strong>Assignee:</strong> ${assigneeHtml} · 
+      <strong>Priority:</strong> ${p.priority} · 
+      <strong>Status:</strong> ${p.status} · 
+      <strong>Due:</strong> ${p.due || '—'}
+      ${p.desc ? `<br><strong>Description:</strong> ${p.desc}` : ''}
+    `;
+    renderSubtaskAssigneeDropdown();
+    document.getElementById('modal').classList.add('open');
+    renderSubtasks();
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    currentProjectId = null;
+    clearSubtaskForm();
+  }
+
+  function renderSubtasks() {
+    const p = projects.find(item => item.id === currentProjectId);
+    if (!p) return;
+    document.querySelectorAll('.subtask-column .subtask-cards').forEach(c => c.innerHTML = '');
+    (p.subtasks || []).forEach(s => {
+      const col = document.querySelector(`.subtask-column[data-status="${s.status}"] .subtask-cards`);
+      if (!col) return;
+      const card = document.createElement('div');
+      card.className = `subtask-card priority-${s.priority}`;
+      card.draggable = true;
+      card.dataset.id = s.id;
+      card.innerHTML = `
+        <div class="subtask-card-title">${s.name}</div>
+        <div class="subtask-card-meta">${s.assignee ? memberTagHtml(s.assignee) : ''}${s.due ? ' Due: ' + s.due : ''}</div>
+        <div class="subtask-card-actions">
+          <button class="btn-edit" onclick="editSubtask(${s.id})">Edit</button>
+          <button class="btn-del" onclick="delSubtask(${s.id})">Del</button>
+        </div>
+      `;
+      col.appendChild(card);
+    });
+    addSubtaskDragListeners();
+  }
+
+  function addSubtaskDragListeners() {
+    document.querySelectorAll('.subtask-card').forEach(card => {
+      card.addEventListener('dragstart', e => {
+        card.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', card.dataset.id);
+        e.dataTransfer.setData('type', 'subtask');
+      });
+      card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    });
+  }
+
+  document.querySelectorAll('.subtask-column').forEach(col => {
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+    col.addEventListener('drop', async e => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      if (e.dataTransfer.getData('type') !== 'subtask') return;
+      const id = Number(e.dataTransfer.getData('text/plain'));
+      const proj = projects.find(p => p.id === currentProjectId);
+      if (proj) {
+        const sub = (proj.subtasks || []).find(s => s.id === id);
+        if (sub) {
+          sub.status = col.dataset.status;
+          await api.post(`/family/${currentFamily}/projects`, proj);
+          projects = await api.get(`/family/${currentFamily}/projects`);
+          renderSubtasks();
+          render();
+        }
+      }
+    });
+  });
+
+  function newSubtaskId() { return Date.now(); }
+
+  async function saveSubtask() {
+    const id = document.getElementById('subtaskId').value;
+    const subtask = {
+      id: id ? Number(id) : newSubtaskId(),
+      name: document.getElementById('subtaskName').value,
+      status: document.getElementById('subtaskStatus').value,
+      priority: document.getElementById('subtaskPriority').value,
+      assignee: document.getElementById('subtaskAssignee').value || null,
+      due: document.getElementById('subtaskDue').value,
+      notes: document.getElementById('subtaskNotes').value
+    };
+    if (!subtask.name) return alert('Subtask name is required');
+    const proj = projects.find(p => p.id === currentProjectId);
+    if (!proj) return;
+    if (!proj.subtasks) proj.subtasks = [];
+    const idx = proj.subtasks.findIndex(s => s.id === subtask.id);
+    if (idx > -1) proj.subtasks[idx] = subtask;
+    else proj.subtasks.push(subtask);
+    await api.post(`/family/${currentFamily}/projects`, proj);
+    projects = await api.get(`/family/${currentFamily}/projects`);
+    renderSubtasks();
+    render();
+    if (currentView === 'gantt') renderGantt();
+    clearSubtaskForm();
+  }
+
+  function editSubtask(id) {
+    const p = projects.find(item => item.id === currentProjectId);
+    const s = (p?.subtasks || []).find(sub => sub.id === id);
+    if (!s) return;
+    document.getElementById('subtaskFormTitle').textContent = 'Edit Subtask';
+    document.getElementById('subtaskId').value = s.id;
+    document.getElementById('subtaskName').value = s.name;
+    document.getElementById('subtaskStatus').value = s.status;
+    document.getElementById('subtaskPriority').value = s.priority;
+    document.getElementById('subtaskAssignee').value = s.assignee || '';
+    document.getElementById('subtaskDue').value = s.due || '';
+    document.getElementById('subtaskNotes').value = s.notes || '';
+  }
+
+  async function delSubtask(id) {
+    if (!confirm('Delete this subtask?')) return;
+    const proj = projects.find(p => p.id === currentProjectId);
+    if (proj) {
+      proj.subtasks = (proj.subtasks || []).filter(s => s.id !== id);
+      await api.post(`/family/${currentFamily}/projects`, proj);
+      projects = await api.get(`/family/${currentFamily}/projects`);
+      renderSubtasks();
+      render();
+      if (currentView === 'gantt') renderGantt();
+    }
+  }
+
+  function clearSubtaskForm() {
+    document.getElementById('subtaskFormTitle').textContent = 'Add Subtask';
+    ['subtaskId','subtaskName','subtaskDue','subtaskNotes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('subtaskAssignee').value = '';
+    document.getElementById('subtaskStatus').value = 'Planned';
+    document.getElementById('subtaskPriority').value = 'Medium';
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // POMODORO ENGINE
+  // ═══════════════════════════════════════════════════════════
+  const pomo = {
+    workMins: 25,
+    breakMins: 5,
+    state: 'idle',   // idle | work | paused | break
+    secondsLeft: 0,
+    totalSeconds: 0,
+    interval: null,
+    activeTaskId: null,
+    activeTaskName: '',
+    sessions: {},    // taskId -> count
+
+    get circumference() { return 2 * Math.PI * 54; },
+
+    start(taskId, taskName) {
+      if (this.interval) clearInterval(this.interval);
+      this.activeTaskId = taskId;
+      this.activeTaskName = taskName;
+      this.state = 'work';
+      this.secondsLeft = this.workMins * 60;
+      this.totalSeconds = this.secondsLeft;
+      this.tick();
+      this.interval = setInterval(() => this.tick(), 1000);
+      this.updateUI();
+    },
+
+    pause() {
+      if (this.state !== 'work') return;
+      clearInterval(this.interval);
+      this.interval = null;
+      this.state = 'paused';
+      this.updateUI();
+    },
+
+    resume() {
+      if (this.state !== 'paused') return;
+      this.interval = setInterval(() => this.tick(), 1000);
+      this.state = 'work';
+      this.updateUI();
+    },
+
+    skip() {
+      clearInterval(this.interval);
+      this.interval = null;
+      if (this.state === 'break') {
+        this.state = 'work';
+        this.secondsLeft = this.workMins * 60;
+        this.totalSeconds = this.secondsLeft;
+      } else {
+        this.startBreak();
+        return;
+      }
+      this.interval = setInterval(() => this.tick(), 1000);
+      this.updateUI();
+    },
+
+    stop() {
+      clearInterval(this.interval);
+      this.interval = null;
+      this.state = 'idle';
+      this.activeTaskId = null;
+      this.activeTaskName = '';
+      document.title = 'Family Project Tracker';
+      this.updateUI();
+    },
+
+    startBreak() {
+      this.state = 'break';
+      this.secondsLeft = this.breakMins * 60;
+      this.totalSeconds = this.secondsLeft;
+      this.interval = setInterval(() => this.tick(), 1000);
+      this.notify('☕ Break time!', `${this.breakMins} min break. You earned it.`);
+      this.updateUI();
+    },
+
+    tick() {
+      if (this.secondsLeft > 0) {
+        this.secondsLeft--;
+        this.updateRing();
+        this.updateTimeDisplay();
+        document.title = `${this.formatTime(this.secondsLeft)} — ${this.state === 'break' ? '☕ Break' : '🍅 Focus'}`;
+      } else {
+        clearInterval(this.interval);
+        this.interval = null;
+        if (this.state === 'work') {
+          if (!this.sessions[this.activeTaskId]) this.sessions[this.activeTaskId] = 0;
+          this.sessions[this.activeTaskId]++;
+          this.notify('🍅 Pomodoro complete!', `Nice work on "${this.activeTaskName}"! Take a break.`);
+          this.startBreak();
+        } else if (this.state === 'break') {
+          this.notify('⏰ Break over!', 'Ready to focus again?');
+          this.state = 'idle';
+          this.updateUI();
+          document.title = 'Family Project Tracker';
+        }
+      }
+    },
+
+    notify(title, body) {
+      if (Notification.permission === 'granted') {
+        new Notification(title, { body, icon: '🍅' });
+      }
+      // Audio beep via Web Audio API
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [0, 150, 300].forEach(delay => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.frequency.value = 880;
+          gain.gain.setValueAtTime(0.3, ctx.currentTime + delay/1000);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay/1000 + 0.3);
+          osc.start(ctx.currentTime + delay/1000);
+          osc.stop(ctx.currentTime + delay/1000 + 0.3);
+        });
+      } catch(e) {}
+    },
+
+    formatTime(s) {
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    },
+
+    updateTimeDisplay() {
+      const el = document.getElementById('pomoTime');
+      if (el) el.textContent = this.formatTime(this.secondsLeft);
+    },
+
+    updateRing() {
+      const el = document.getElementById('pomoRingProgress');
+      if (!el) return;
+      const pct = this.secondsLeft / (this.totalSeconds || 1);
+      const offset = this.circumference * (1 - pct);
+      el.style.strokeDashoffset = offset;
+      el.classList.toggle('break', this.state === 'break');
+    },
+
+    updateUI() {
+      this.updateTimeDisplay();
+      this.updateRing();
+      // Mode label
+      const lbl = document.getElementById('pomoModeLabel');
+      if (lbl) {
+        lbl.textContent = this.state === 'break' ? '☕ Break' : this.state === 'idle' ? '🍅 Pomodoro' : '🍅 Focus';
+        lbl.className = 'pomo-mode-label' + (this.state === 'break' ? ' break' : '');
+      }
+      // Task name
+      const tn = document.getElementById('pomoTaskName');
+      if (tn) {
+        if (this.activeTaskName) {
+          tn.className = 'pomo-task-name';
+          tn.textContent = this.activeTaskName;
+        } else {
+          tn.className = 'pomo-task-none';
+          tn.textContent = 'No task selected — pick one below ↓';
+        }
+      }
+      // Sessions
+      const sEl = document.getElementById('pomoSessions');
+      if (sEl) {
+        const count = this.activeTaskId ? (this.sessions[this.activeTaskId] || 0) : 0;
+        sEl.textContent = '🍅'.repeat(count) || (this.state === 'idle' ? '' : '');
+      }
+      // Controls
+      const ctrl = document.getElementById('pomoControls');
+      if (ctrl) {
+        if (this.state === 'idle') {
+          ctrl.innerHTML = `<button class="pomo-btn start" onclick="pomoPickTask()">▶ Start — pick a task</button>`;
+        } else if (this.state === 'work') {
+          ctrl.innerHTML = `
+            <button class="pomo-btn pause" onclick="pomo.pause()">⏸ Pause</button>
+            <button class="pomo-btn skip" onclick="pomo.skip()">⏭ Skip to Break</button>
+            <button class="pomo-btn stop" onclick="pomo.stop()">⏹ Stop</button>`;
+        } else if (this.state === 'paused') {
+          ctrl.innerHTML = `
+            <button class="pomo-btn resume" onclick="pomo.resume()">▶ Resume</button>
+            <button class="pomo-btn skip" onclick="pomo.skip()">⏭ Skip to Break</button>
+            <button class="pomo-btn stop" onclick="pomo.stop()">⏹ Stop</button>`;
+        } else if (this.state === 'break') {
+          ctrl.innerHTML = `
+            <button class="pomo-btn resume" onclick="pomo.skip()">⏭ Skip Break</button>
+            <button class="pomo-btn stop" onclick="pomo.stop()">⏹ Stop</button>`;
+        }
+      }
+      // Highlight active task card
+      document.querySelectorAll('.lockin-task').forEach(el => {
+        el.classList.remove('pomo-active', 'break-active');
+      });
+      if (this.activeTaskId && this.state !== 'idle') {
+        const activeEl = document.getElementById(`task-${this.activeTaskId}`);
+        if (activeEl) {
+          activeEl.classList.add('pomo-active');
+          if (this.state === 'break') activeEl.classList.add('break-active');
+        }
+      }
+      // Start buttons
+      document.querySelectorAll('.lockin-start-pomo').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.taskId === String(this.activeTaskId) && this.state !== 'idle');
+        btn.textContent = (btn.dataset.taskId === String(this.activeTaskId) && this.state !== 'idle') ? '▶ Active' : '▶ Focus';
+      });
+    }
+  };
+
+  function pomoPickTask() {
+    // Flash all focus buttons to prompt user to pick
+    document.querySelectorAll('.lockin-start-pomo').forEach(btn => {
+      btn.style.background = '#fef3c7';
+      setTimeout(() => btn.style.background = '', 600);
+    });
+  }
+
+  function pomoStartTask(taskId, taskName) {
+    if (Notification.permission === 'default') Notification.requestPermission();
+    pomo.start(taskId, taskName);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // LOCK IN MODE
+  // ═══════════════════════════════════════════════════════════
+  function renderLockin() {
+    const container = document.getElementById('lockinView');
+    if (!currentFamily || projects.length === 0) {
+      container.innerHTML = '<div class="lockin-empty"><span>🔒</span>Select a family to lock in.</div>';
+      return;
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const PRIO_ORDER = { High: 0, Medium: 1, Low: 2 };
+
+    const tasks = [];
+    projects.forEach(proj => {
+      if (proj.status !== 'Completed') {
+        if (!filterMemberId || proj.assignee === filterMemberId) {
+          tasks.push({
+            id: `proj-${proj.id}`, name: proj.name,
+            priority: proj.priority || 'Medium', due: proj.due || null,
+            overdue: proj.due ? proj.due < todayStr : false,
+            today: proj.due === todayStr,
+            projectName: null,
+            isSubtask: false, projId: proj.id, subtaskId: null,
+            assignee: proj.assignee || null
+          });
+        }
+      }
+      (proj.subtasks || []).forEach(sub => {
+        if (sub.status !== 'Completed') {
+          if (!filterMemberId || sub.assignee === filterMemberId) {
+            tasks.push({
+              id: `sub-${proj.id}-${sub.id}`, name: sub.name,
+              priority: sub.priority || 'Medium', due: sub.due || null,
+              overdue: sub.due ? sub.due < todayStr : false,
+              today: sub.due === todayStr,
+              projectName: proj.name,
+              isSubtask: true, projId: proj.id, subtaskId: sub.id,
+              assignee: sub.assignee || null
+            });
+          }
+        }
+      });
+    });
+
+    tasks.sort((a, b) => {
+      // Overdue first, then today, then future/no-date — within each group sort by priority
+      const urgencyA = a.overdue ? 0 : a.today ? 1 : 2;
+      const urgencyB = b.overdue ? 0 : b.today ? 1 : 2;
+      if (urgencyA !== urgencyB) return urgencyA - urgencyB;
+      return (PRIO_ORDER[a.priority] || 1) - (PRIO_ORDER[b.priority] || 1);
+    });
+
+    // Pomodoro widget (always shown in Lock In)
+    const circumference = pomo.circumference;
+    const pomoPct = pomo.state !== 'idle' ? pomo.secondsLeft / (pomo.totalSeconds || 1) : 1;
+    const pomoOffset = circumference * (1 - pomoPct);
+    const pomoTime = pomo.state !== 'idle' ? pomo.formatTime(pomo.secondsLeft) : `${String(pomo.workMins).padStart(2,'0')}:00`;
+    const pomoTaskHtml = pomo.activeTaskName
+      ? `<div class="pomo-task-name" id="pomoTaskName">${pomo.activeTaskName}</div>`
+      : `<div class="pomo-task-none" id="pomoTaskName">No task selected — pick one below ↓</div>`;
+    const sessionCount = pomo.activeTaskId ? (pomo.sessions[pomo.activeTaskId] || 0) : 0;
+
+    let pomoControlsHtml = '';
+    if (pomo.state === 'idle') {
+      pomoControlsHtml = `<button class="pomo-btn start" onclick="pomoPickTask()">▶ Start — pick a task</button>`;
+    } else if (pomo.state === 'work') {
+      pomoControlsHtml = `
+        <button class="pomo-btn pause" onclick="pomo.pause()">⏸ Pause</button>
+        <button class="pomo-btn skip" onclick="pomo.skip()">⏭ Skip to Break</button>
+        <button class="pomo-btn stop" onclick="pomo.stop()">⏹ Stop</button>`;
+    } else if (pomo.state === 'paused') {
+      pomoControlsHtml = `
+        <button class="pomo-btn resume" onclick="pomo.resume()">▶ Resume</button>
+        <button class="pomo-btn skip" onclick="pomo.skip()">⏭ Skip to Break</button>
+        <button class="pomo-btn stop" onclick="pomo.stop()">⏹ Stop</button>`;
+    } else if (pomo.state === 'break') {
+      pomoControlsHtml = `
+        <button class="pomo-btn resume" onclick="pomo.skip()">⏭ Skip Break</button>
+        <button class="pomo-btn stop" onclick="pomo.stop()">⏹ Stop</button>`;
+    }
+
+    let html = `
+    <div class="pomo-widget">
+      <button class="pomo-settings-btn" onclick="document.getElementById('pomoSettings').classList.toggle('open')" title="Settings">⚙️</button>
+      <div class="pomo-mode-label${pomo.state === 'break' ? ' break' : ''}" id="pomoModeLabel">
+        ${pomo.state === 'break' ? '☕ Break' : '🍅 Pomodoro'}
+      </div>
+      <div class="pomo-ring-wrap">
+        <svg class="pomo-ring" width="140" height="140" viewBox="0 0 140 140">
+          <circle class="pomo-ring-bg" cx="70" cy="70" r="54"/>
+          <circle class="pomo-ring-progress${pomo.state === 'break' ? ' break' : ''}" id="pomoRingProgress"
+            cx="70" cy="70" r="54"
+            stroke-dasharray="${circumference}"
+            stroke-dashoffset="${pomoOffset}"/>
+        </svg>
+        <div class="pomo-time" id="pomoTime">${pomoTime}</div>
+      </div>
+      ${pomoTaskHtml}
+      <div class="pomo-sessions" id="pomoSessions">${'🍅'.repeat(sessionCount)}</div>
+      <div class="pomo-controls" id="pomoControls">${pomoControlsHtml}</div>
+      <div class="pomo-settings-panel" id="pomoSettings">
+        <label>Focus (mins) <input type="number" id="pomoWorkMins" value="${pomo.workMins}" min="1" max="90" onchange="pomo.workMins=+this.value"/></label>
+        <label>Break (mins) <input type="number" id="pomoBreakMins" value="${pomo.breakMins}" min="1" max="30" onchange="pomo.breakMins=+this.value"/></label>
+      </div>
+    </div>`;
+
+    if (tasks.length === 0) {
+      html += `<div class="lockin-empty"><span>🎉</span>Nothing due today — you're all clear!</div>`;
+      container.innerHTML = html;
+      return;
+    }
+
+    const overdueCount = tasks.filter(t => t.overdue).length;
+    const todayCount = tasks.filter(t => t.today).length;
+    const upcomingCount = tasks.length - overdueCount - todayCount;
+    const subtitle = [
+      overdueCount > 0 ? `${overdueCount} overdue` : '',
+      todayCount > 0 ? `${todayCount} due today` : '',
+      upcomingCount > 0 ? `${upcomingCount} upcoming` : ''
+    ].filter(Boolean).join(' · ');
+    html += `<div class="lockin-header"><h2>Today's Focus</h2><p>${tasks.length} task${tasks.length !== 1 ? 's' : ''} · ${subtitle}</p></div>`;
+
+    let lastPrio = null;
+    tasks.forEach(t => {
+      if (t.priority !== lastPrio) {
+        const icons = { High: '🔴', Medium: '🟡', Low: '🟢' };
+        html += `<div class="lockin-section-label">${icons[t.priority] || ''} ${t.priority} Priority</div>`;
+        lastPrio = t.priority;
+      }
+      const dueLabel = t.overdue ? `⚠️ Overdue: ${t.due}` : t.today ? `📅 Due today` : t.due ? `📅 Due: ${t.due}` : `📅 No due date`;
+      const projectTag = t.isSubtask
+        ? `<span class="lockin-subtask-tag">subtask</span><span class="lockin-project-tag">${t.projectName}</span>`
+        : `<span class="lockin-project-tag">project</span>`;
+      const isActive = t.id === pomo.activeTaskId && pomo.state !== 'idle';
+      const taskClasses = [
+        'lockin-task',
+        `priority-${t.priority}`,
+        t.overdue ? 'overdue' : '',
+        isActive ? 'pomo-active' : '',
+        isActive && pomo.state === 'break' ? 'break-active' : ''
+      ].filter(Boolean).join(' ');
+      const safeName = t.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+      html += `<div class="${taskClasses}" id="task-${t.id}">
+        <button class="lockin-check" onclick="completeLockinTask('${t.id}', ${t.projId}, ${t.subtaskId})" title="Mark complete">✓</button>
+        <div class="lockin-task-body">
+          <div class="lockin-task-name">${t.name}</div>
+          <div class="lockin-task-meta">${projectTag}<span class="lockin-due">${dueLabel}</span>${t.assignee ? memberTagHtml(t.assignee) : ''}</div>
+        </div>
+        <button class="lockin-start-pomo${isActive ? ' active' : ''}" data-task-id="${t.id}"
+          onclick="pomoStartTask('${t.id}', '${safeName}')"
+          title="Start Pomodoro on this task">${isActive ? '▶ Active' : '▶ Focus'}</button>
+        <span class="lockin-prio-badge ${t.priority}">${t.priority}</span>
+      </div>`;
+    });
+
+    container.innerHTML = html;
+  }
+
+  async function completeLockinTask(taskId, projId, subtaskId) {
+    const el = document.getElementById(`task-${taskId}`);
+    if (el) {
+      el.classList.add('completing');
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    if (subtaskId) {
+      const proj = projects.find(p => p.id === projId);
+      if (proj) {
+        const sub = (proj.subtasks || []).find(s => s.id === subtaskId);
+        if (sub) {
+          sub.status = 'Completed';
+          await api.post(`/family/${currentFamily}/projects`, proj);
+        }
+      }
+    } else {
+      const proj = projects.find(p => p.id === projId);
+      if (proj) {
+        proj.status = 'Completed';
+        await api.post(`/family/${currentFamily}/projects`, proj);
+      }
+    }
+
+    projects = await api.get(`/family/${currentFamily}/projects`);
+    render();
+    renderLockin();
+  }
+
+  // Init
+  initGanttDates();
+  loadFamilies();
+
+  // Wire up members modal buttons
+  document.getElementById('closeMembersModalBtn').addEventListener('click', closeMembersModal);
+  document.getElementById('addMemberBtn').addEventListener('click', addMember);
+  document.getElementById('newMemberName').addEventListener('keydown', e => { if (e.key === 'Enter') addMember(); });
+  // Close modal on overlay click
+  document.getElementById('membersModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeMembersModal(); });
+</script>
+</body>
+</html>

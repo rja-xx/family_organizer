@@ -1,0 +1,80 @@
+{
+  "familyId": "jakobsens",
+  "name": "Jakobsens",
+  "projects": [
+    {
+      "id": 1772532396821,
+      "name": "Städa förrådet",
+      "desc": "Få ordning i inneförrådet",
+      "owner": "Julia",
+      "start": "2026-03-06",
+      "due": "2026-03-13",
+      "status": "In-progress",
+      "priority": "Medium",
+      "notes": "",
+      "subtasks": [
+        {
+          "id": 1772532420948,
+          "name": "Ta ut saker som kan slängas",
+          "status": "In-progress",
+          "priority": "Medium",
+          "due": "",
+          "notes": ""
+        },
+        {
+          "id": 1772532441100,
+          "name": "skapa en ny organisering",
+          "status": "Planned",
+          "priority": "Medium",
+          "due": "",
+          "notes": ""
+        },
+        {
+          "id": 1772532455451,
+          "name": "rätta skohyllan",
+          "status": "Completed",
+          "priority": "Medium",
+          "due": "",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": 1772532720178,
+      "name": "besiktiga volvon",
+      "desc": "",
+      "owner": "",
+      "start": "2026-03-01",
+      "due": "2026-03-10",
+      "status": "Planned",
+      "priority": "Medium",
+      "notes": "",
+      "subtasks": [
+        {
+          "id": 1772532729283,
+          "name": "byta lampa",
+          "status": "Planned",
+          "priority": "Medium",
+          "due": "",
+          "notes": ""
+        },
+        {
+          "id": 1772532735563,
+          "name": "boka besiktning",
+          "status": "Planned",
+          "priority": "Medium",
+          "due": "",
+          "notes": ""
+        },
+        {
+          "id": 1772532766618,
+          "name": "genomföra besiktning",
+          "status": "Planned",
+          "priority": "Medium",
+          "due": "",
+          "notes": ""
+        }
+      ]
+    }
+  ]
+}
