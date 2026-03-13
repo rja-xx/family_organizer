@@ -726,7 +726,9 @@
         const proj = projects.find(p => p.id === id);
         if (proj) {
           proj.status = col.dataset.status;
+          if (col.dataset.status === 'Completed') applyRecurrence(proj);
           await api.post(`/family/${currentFamily}/projects`, proj);
+          projects = await api.get(`/family/${currentFamily}/projects`);
           render();
         }
       });
@@ -989,25 +991,6 @@
       card.addEventListener('dragend', () => card.classList.remove('dragging'));
     });
   }
-
-  document.querySelectorAll('.column').forEach(col => {
-    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
-    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
-    col.addEventListener('drop', async e => {
-      e.preventDefault();
-      col.classList.remove('drag-over');
-      if (e.dataTransfer.getData('type') !== 'project') return;
-      const id = Number(e.dataTransfer.getData('text/plain'));
-      const proj = projects.find(p => p.id === id);
-      if (proj) {
-        proj.status = col.dataset.status;
-        if (col.dataset.status === 'Completed') applyRecurrence(proj);
-        await api.post(`/family/${currentFamily}/projects`, proj);
-        projects = await api.get(`/family/${currentFamily}/projects`);
-        render();
-      }
-    });
-  });
 
   // ═══════════════════════════════════════════════════════════
   // RECURRENCE
