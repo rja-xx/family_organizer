@@ -328,6 +328,7 @@
     .member-add-form { display: flex; gap: 8px; margin-top: 8px; }
     .member-add-form input { flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
     .member-add-form button { padding: 8px 14px; background: var(--planned); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .recurrence-badge { font-size: 11px; background: #e0f2fe; color: #0369a1; border-radius: 4px; padding: 1px 5px; margin-left: 4px; font-weight: 500; vertical-align: middle; }
   </style>
 </head>
 <body>
@@ -373,6 +374,7 @@
         <label>Start <input type="date" id="projStart"/></label>
         <label>Due <input type="date" id="projDue"/></label>
         <label>Status <select id="projStatus"><option value="Planned">Planned</option><option value="In-progress">In Progress</option><option value="Completed">Completed</option><option value="Blocked">Blocked</option></select></label>
+        <label>Recurrence <select id="projRecurrence"><option value="none">None</option><option value="daily">🔁 Daily</option><option value="weekly">🔁 Weekly</option><option value="monthly">🔁 Monthly</option></select></label>
         <label>Notes <input type="text" id="projNotes"/></label>
       </div>
       <div class="form-actions">
@@ -698,7 +700,7 @@
       card.draggable = true;
       card.dataset.id = p.id;
       card.innerHTML = `
-        <div class="card-title">${p.name}</div>
+        <div class="card-title">${p.name}${p.recurrence && p.recurrence !== 'none' ? ` <span class="recurrence-badge" title="Repeats ${p.recurrence}">🔁 ${p.recurrence}</span>` : ''}</div>
         <div class="card-meta">${p.assignee ? memberTagHtml(p.assignee) : '<span style="color:var(--muted);font-size:12px">Unassigned</span>'} · Due: ${p.due || '—'}</div>
         ${p.desc ? `<div class="card-desc">${p.desc}</div>` : ''}
         ${total > 0 ? `<div class="card-progress">Subtasks: ${done}/${total}</div>` : ''}
@@ -999,6 +1001,7 @@
       const proj = projects.find(p => p.id === id);
       if (proj) {
         proj.status = col.dataset.status;
+        if (col.dataset.status === 'Completed') applyRecurrence(proj);
         await api.post(`/family/${currentFamily}/projects`, proj);
         render();
       }
@@ -1006,6 +1009,25 @@
   });
 
   // ═══════════════════════════════════════════════════════════
+  // RECURRENCE
+  // ═══════════════════════════════════════════════════════════
+  function nextDueDate(currentDue, recurrence) {
+    const base = currentDue ? new Date(currentDue) : new Date();
+    const d = new Date(base);
+    if (recurrence === 'daily') d.setDate(d.getDate() + 1);
+    else if (recurrence === 'weekly') d.setDate(d.getDate() + 7);
+    else if (recurrence === 'monthly') d.setMonth(d.getMonth() + 1);
+    return d.toISOString().split('T')[0];
+  }
+
+  function applyRecurrence(proj) {
+    // Returns true if recurrence was applied (i.e. task rolled forward instead of completing)
+    if (!proj.recurrence || proj.recurrence === 'none') return false;
+    proj.due = nextDueDate(proj.due, proj.recurrence);
+    proj.status = 'In-progress';
+    return true;
+  }
+
   // PROJECT FORM
   // ═══════════════════════════════════════════════════════════
   function newId() { return Date.now(); }
@@ -1024,6 +1046,7 @@
       due: document.getElementById('projDue').value,
       status: document.getElementById('projStatus').value,
       priority: document.getElementById('projPriority').value,
+      recurrence: document.getElementById('projRecurrence').value || 'none',
       notes: document.getElementById('projNotes').value,
       subtasks: existing ? existing.subtasks || [] : []
     };
@@ -1046,6 +1069,7 @@
     document.getElementById('projDue').value = p.due || '';
     document.getElementById('projStatus').value = p.status;
     document.getElementById('projPriority').value = p.priority;
+    document.getElementById('projRecurrence').value = p.recurrence || 'none';
     document.getElementById('projNotes').value = p.notes || '';
     document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
   }
@@ -1064,6 +1088,7 @@
     document.getElementById('projAssignee').value = '';
     document.getElementById('projStatus').value = 'Planned';
     document.getElementById('projPriority').value = 'Medium';
+    document.getElementById('projRecurrence').value = 'none';
   }
 
   document.getElementById('projForm').addEventListener('submit', saveForm);
@@ -1614,7 +1639,8 @@
     } else {
       const proj = projects.find(p => p.id === projId);
       if (proj) {
-        proj.status = 'Completed';
+        const recycled = applyRecurrence(proj);
+        if (!recycled) proj.status = 'Completed';
         await api.post(`/family/${currentFamily}/projects`, proj);
       }
     }
