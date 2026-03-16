@@ -1,0 +1,667 @@
+{
+  "familyId": "jakobsen",
+  "categories": [
+    {
+      "id": "housing",
+      "name": "Housing",
+      "color": "#4A90E2"
+    },
+    {
+      "id": "food",
+      "name": "Food & Groceries",
+      "color": "#7ED321"
+    },
+    {
+      "id": "transport",
+      "name": "Transport",
+      "color": "#F5A623"
+    },
+    {
+      "id": "health",
+      "name": "Health",
+      "color": "#D0021B"
+    },
+    {
+      "id": "education",
+      "name": "Education",
+      "color": "#9B59B6"
+    },
+    {
+      "id": "entertainment",
+      "name": "Entertainment",
+      "color": "#1ABC9C"
+    },
+    {
+      "id": "clothing",
+      "name": "Clothing",
+      "color": "#E67E22"
+    },
+    {
+      "id": "savings",
+      "name": "Savings",
+      "color": "#2ECC71"
+    },
+    {
+      "id": "utilities",
+      "name": "Utilities",
+      "color": "#95A5A6"
+    },
+    {
+      "id": "other",
+      "name": "Other",
+      "color": "#BDC3C7"
+    }
+  ],
+  "budgets": {},
+  "expenses": [
+    {
+      "id": 3000,
+      "date": "2026-01-28",
+      "categoryId": "entertainment",
+      "amount": 139,
+      "description": "CHINA GARDEN",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3001,
+      "date": "2026-01-31",
+      "categoryId": "entertainment",
+      "amount": 200,
+      "description": "INTERPOOL UPPSALA",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3002,
+      "date": "2026-01-31",
+      "categoryId": "transport",
+      "amount": 151.88,
+      "description": "INGO UPPSALA FULLERO",
+      "notes": "AUTOMATED FUEL DISPENSERS"
+    },
+    {
+      "id": 3003,
+      "date": "2026-01-31",
+      "categoryId": "entertainment",
+      "amount": 425,
+      "description": "OLEARYS UPPSALA CITY",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3004,
+      "date": "2026-01-31",
+      "categoryId": "other",
+      "amount": 369,
+      "description": "CLAS OHLSON 154",
+      "notes": "HOME SUPPLY WAREHOUSE STORES"
+    },
+    {
+      "id": 3005,
+      "date": "2026-01-31",
+      "categoryId": "food",
+      "amount": 71.9,
+      "description": "ICA KVANTUM UPPSALA",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3006,
+      "date": "2026-01-31",
+      "categoryId": "entertainment",
+      "amount": 60,
+      "description": "INTERPOOL  UPPSALA",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3007,
+      "date": "2026-01-31",
+      "categoryId": "entertainment",
+      "amount": 180,
+      "description": "INTERPOOL  UPPSALA",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3008,
+      "date": "2026-01-31",
+      "categoryId": "entertainment",
+      "amount": 89,
+      "description": "INTERPOOL  UPPSALA",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3009,
+      "date": "2026-02-01",
+      "categoryId": "entertainment",
+      "amount": 608,
+      "description": "Sweet*Indoor Golf Group",
+      "notes": "MEMBER CLUBS/SPORT/REC/GOLF"
+    },
+    {
+      "id": 3010,
+      "date": "2026-02-01",
+      "categoryId": "other",
+      "amount": 1398,
+      "description": "Webhallen Sverige AB",
+      "notes": "ELECTRONICS STORES"
+    },
+    {
+      "id": 3011,
+      "date": "2026-02-01",
+      "categoryId": "transport",
+      "amount": 543.22,
+      "description": "CIRCLE K UPPSALA BERBYLED",
+      "notes": "AUTOMATED FUEL DISPENSERS"
+    },
+    {
+      "id": 3012,
+      "date": "2026-02-01",
+      "categoryId": "food",
+      "amount": 388.95,
+      "description": "ICA SUPERMARKET STORVRETA",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3013,
+      "date": "2026-02-02",
+      "categoryId": "food",
+      "amount": 358.23,
+      "description": "ICA SUPERMARKET STORVRETA",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3014,
+      "date": "2026-02-02",
+      "categoryId": "entertainment",
+      "amount": 149,
+      "description": "TUGG UPPSALA",
+      "notes": "FAST FOOD RESTAURANTS"
+    },
+    {
+      "id": 3015,
+      "date": "2026-02-03",
+      "categoryId": "food",
+      "amount": 570.63,
+      "description": "ICA SUPERMARKET STORVRETA",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3016,
+      "date": "2026-02-03",
+      "categoryId": "entertainment",
+      "amount": 608,
+      "description": "Sweet*Indoor Golf Group",
+      "notes": "MEMBER CLUBS/SPORT/REC/GOLF"
+    },
+    {
+      "id": 3017,
+      "date": "2026-02-04",
+      "categoryId": "entertainment",
+      "amount": 219,
+      "description": "SPOTIFY",
+      "notes": "DIGITAL GOODS MEDIA – BOOKS, MOVIES, MUSIC"
+    },
+    {
+      "id": 3018,
+      "date": "2026-02-04",
+      "categoryId": "entertainment",
+      "amount": 129,
+      "description": "INNEBANDYTV",
+      "notes": "COMPUTER SOFTWARE STORES"
+    },
+    {
+      "id": 3019,
+      "date": "2026-02-05",
+      "categoryId": "entertainment",
+      "amount": 85,
+      "description": "APPLE.COM/BILL",
+      "notes": "DIGITAL GOODS – LARGE DIGITAL GOODS MERCHANT"
+    },
+    {
+      "id": 3020,
+      "date": "2026-02-05",
+      "categoryId": "entertainment",
+      "amount": 12,
+      "description": "APPLE.COM/BILL",
+      "notes": "DIGITAL GOODS – LARGE DIGITAL GOODS MERCHANT"
+    },
+    {
+      "id": 3021,
+      "date": "2026-02-05",
+      "categoryId": "entertainment",
+      "amount": 1700,
+      "description": "Pinchos",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3022,
+      "date": "2026-02-05",
+      "categoryId": "entertainment",
+      "amount": 147,
+      "description": "UPPSALA BANH MI",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3023,
+      "date": "2026-02-05",
+      "categoryId": "transport",
+      "amount": 153.28,
+      "description": "INGO UPPSALA FULLERO",
+      "notes": "AUTOMATED FUEL DISPENSERS"
+    },
+    {
+      "id": 3024,
+      "date": "2026-02-06",
+      "categoryId": "entertainment",
+      "amount": 145,
+      "description": "IZAKAYA BY UNCLE PHONKHAC",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3025,
+      "date": "2026-02-06",
+      "categoryId": "entertainment",
+      "amount": 92,
+      "description": "Max Burgers 2010020_Kiosk",
+      "notes": "FAST FOOD RESTAURANTS"
+    },
+    {
+      "id": 3026,
+      "date": "2026-02-06",
+      "categoryId": "entertainment",
+      "amount": 12,
+      "description": "APPLE.COM/BILL",
+      "notes": "DIGITAL GOODS – LARGE DIGITAL GOODS MERCHANT"
+    },
+    {
+      "id": 3027,
+      "date": "2026-02-07",
+      "categoryId": "food",
+      "amount": 224.08,
+      "description": "MAXI ICA STORMARKNAD GNIS",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3028,
+      "date": "2026-02-07",
+      "categoryId": "transport",
+      "amount": 554.57,
+      "description": "CIRCLE K KNIVSTA",
+      "notes": "AUTOMATED FUEL DISPENSERS"
+    },
+    {
+      "id": 3029,
+      "date": "2026-02-08",
+      "categoryId": "entertainment",
+      "amount": 59,
+      "description": "Solid 991770551990314299",
+      "notes": "CABLE/PAY TV SERVICES"
+    },
+    {
+      "id": 3030,
+      "date": "2026-02-08",
+      "categoryId": "other",
+      "amount": 90.99,
+      "description": "AMAZON.SE* EQ7YK5VQ5",
+      "notes": "MISC SPECIALTY RETAIL"
+    },
+    {
+      "id": 3031,
+      "date": "2026-02-10",
+      "categoryId": "entertainment",
+      "amount": 140,
+      "description": "UPPSALA KONSERTKONGRESS",
+      "notes": "THEATRICAL PRODUCERS"
+    },
+    {
+      "id": 3032,
+      "date": "2026-02-11",
+      "categoryId": "transport",
+      "amount": 186,
+      "description": "VPARTS.SE",
+      "notes": "AUTOMOTIVE PARTS STORES"
+    },
+    {
+      "id": 3033,
+      "date": "2026-02-11",
+      "categoryId": "food",
+      "amount": 357.29,
+      "description": "ICA SUPERMARKET STORVRETA",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3034,
+      "date": "2026-02-12",
+      "categoryId": "entertainment",
+      "amount": 199,
+      "description": "NETFLIX.COM",
+      "notes": "CABLE/PAY TV SERVICES"
+    },
+    {
+      "id": 3035,
+      "date": "2026-02-12",
+      "categoryId": "other",
+      "amount": 170.49,
+      "description": "INNSAMLING VIA SPOND AS",
+      "notes": "CHARITABLE/SOC SERVICE ORGS"
+    },
+    {
+      "id": 3036,
+      "date": "2026-02-12",
+      "categoryId": "food",
+      "amount": 269.7,
+      "description": "ICA SUPERMARKET STORVRETA",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3037,
+      "date": "2026-02-12",
+      "categoryId": "entertainment",
+      "amount": 189,
+      "description": "DONER  CO",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3038,
+      "date": "2026-02-13",
+      "categoryId": "entertainment",
+      "amount": 504,
+      "description": "Sweet*Indoor Golf Group",
+      "notes": "MEMBER CLUBS/SPORT/REC/GOLF"
+    },
+    {
+      "id": 3039,
+      "date": "2026-02-13",
+      "categoryId": "entertainment",
+      "amount": 130,
+      "description": "KATALIN AND ALL THAT JAZZ",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3040,
+      "date": "2026-02-13",
+      "categoryId": "transport",
+      "amount": 397.09,
+      "description": "INGO UPPSALA FULLERO",
+      "notes": "AUTOMATED FUEL DISPENSERS"
+    },
+    {
+      "id": 3041,
+      "date": "2026-02-14",
+      "categoryId": "entertainment",
+      "amount": 32,
+      "description": "IFU ARENA",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3042,
+      "date": "2026-02-14",
+      "categoryId": "entertainment",
+      "amount": 350,
+      "description": "KLUBBHUSET I UPPSALA",
+      "notes": "SPORTING GOODS STORES"
+    },
+    {
+      "id": 3043,
+      "date": "2026-02-14",
+      "categoryId": "food",
+      "amount": 2099.1,
+      "description": "MAXI ICA STORMARKNAD GNIS",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3044,
+      "date": "2026-02-14",
+      "categoryId": "entertainment",
+      "amount": 99,
+      "description": "NYA PICCHUS CAF",
+      "notes": "FAST FOOD RESTAURANTS"
+    },
+    {
+      "id": 3045,
+      "date": "2026-02-15",
+      "categoryId": "other",
+      "amount": 454.34,
+      "description": "Ränta",
+      "notes": ""
+    },
+    {
+      "id": 3046,
+      "date": "2026-02-16",
+      "categoryId": "food",
+      "amount": 129.3,
+      "description": "ICA SUPERMARKET STORVRETA",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3047,
+      "date": "2026-02-16",
+      "categoryId": "entertainment",
+      "amount": 271,
+      "description": "TICKSTER.COM",
+      "notes": "THEATRICAL PRODUCERS"
+    },
+    {
+      "id": 3048,
+      "date": "2026-02-17",
+      "categoryId": "entertainment",
+      "amount": 119,
+      "description": "APPLE.COM/BILL",
+      "notes": "DIGITAL GOODS – LARGE DIGITAL GOODS MERCHANT"
+    },
+    {
+      "id": 3049,
+      "date": "2026-02-17",
+      "categoryId": "entertainment",
+      "amount": 159,
+      "description": "APPLE.COM/BILL",
+      "notes": "DIGITAL GOODS – LARGE DIGITAL GOODS MERCHANT"
+    },
+    {
+      "id": 3050,
+      "date": "2026-02-17",
+      "categoryId": "transport",
+      "amount": 782,
+      "description": "PARKSTER SWE",
+      "notes": "PARKING LOTS  GARAGES"
+    },
+    {
+      "id": 3051,
+      "date": "2026-02-17",
+      "categoryId": "entertainment",
+      "amount": 400,
+      "description": "Sweet*GolfUppsala",
+      "notes": "MEMBER CLUBS/SPORT/REC/GOLF"
+    },
+    {
+      "id": 3052,
+      "date": "2026-02-18",
+      "categoryId": "entertainment",
+      "amount": 294,
+      "description": "Max Burgers 2010020_Drive",
+      "notes": "FAST FOOD RESTAURANTS"
+    },
+    {
+      "id": 3053,
+      "date": "2026-02-18",
+      "categoryId": "food",
+      "amount": 162.77,
+      "description": "WILLYS UPPSALA GRANB",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3054,
+      "date": "2026-02-18",
+      "categoryId": "entertainment",
+      "amount": 255,
+      "description": "Google One",
+      "notes": "DIGITAL GOODS – APPLICATIONS (EXCLUDES GAMES)"
+    },
+    {
+      "id": 3055,
+      "date": "2026-02-19",
+      "categoryId": "health",
+      "amount": 212.68,
+      "description": "SPECSAVERS.SE",
+      "notes": "OPTICIANS"
+    },
+    {
+      "id": 3056,
+      "date": "2026-02-19",
+      "categoryId": "other",
+      "amount": 316,
+      "description": "PLANTAGEN UPPSALA 011",
+      "notes": "NURSERIES, LAWN/GARDEN SUPPLY"
+    },
+    {
+      "id": 3057,
+      "date": "2026-02-19",
+      "categoryId": "food",
+      "amount": 76.54,
+      "description": "ICA SUPERMARKET STORVRETA",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3058,
+      "date": "2026-02-20",
+      "categoryId": "transport",
+      "amount": 557.63,
+      "description": "INGO UPPSALA FULLERO",
+      "notes": "AUTOMATED FUEL DISPENSERS"
+    },
+    {
+      "id": 3059,
+      "date": "2026-02-20",
+      "categoryId": "food",
+      "amount": 257.8,
+      "description": "ICA SUPERMARKET STORVRETA",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3060,
+      "date": "2026-02-21",
+      "categoryId": "entertainment",
+      "amount": 487,
+      "description": "STADIUM GRANBY",
+      "notes": "SPORTING GOODS STORES"
+    },
+    {
+      "id": 3061,
+      "date": "2026-02-21",
+      "categoryId": "clothing",
+      "amount": 289.8,
+      "description": "KJELL  CO 54",
+      "notes": "DEPARTMENT STORES"
+    },
+    {
+      "id": 3062,
+      "date": "2026-02-21",
+      "categoryId": "food",
+      "amount": 3010.62,
+      "description": "ICA KVANTUM UPPSALA",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3063,
+      "date": "2026-02-22",
+      "categoryId": "food",
+      "amount": 225,
+      "description": "STORVRETA BUTIK",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3064,
+      "date": "2026-02-22",
+      "categoryId": "entertainment",
+      "amount": 249,
+      "description": "Storytel Sweden AB",
+      "notes": "BOOK STORES"
+    },
+    {
+      "id": 3065,
+      "date": "2026-02-23",
+      "categoryId": "entertainment",
+      "amount": 59,
+      "description": "Solid 281771846719662628",
+      "notes": "CABLE/PAY TV SERVICES"
+    },
+    {
+      "id": 3066,
+      "date": "2026-02-23",
+      "categoryId": "entertainment",
+      "amount": 608,
+      "description": "Sweet*Indoor Golf Group",
+      "notes": "MEMBER CLUBS/SPORT/REC/GOLF"
+    },
+    {
+      "id": 3067,
+      "date": "2026-02-24",
+      "categoryId": "health",
+      "amount": 242.88,
+      "description": "Kronans Apotek AB",
+      "notes": "DRUG STORES  PHARMACIES"
+    },
+    {
+      "id": 3068,
+      "date": "2026-02-24",
+      "categoryId": "food",
+      "amount": 525.13,
+      "description": "ICA SUPERMARKET STORVRETA",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3069,
+      "date": "2026-02-24",
+      "categoryId": "food",
+      "amount": 98,
+      "description": "ICA SUPERMARKET TORGKASSE",
+      "notes": "GROCERY STORES/SUPERMARKETS"
+    },
+    {
+      "id": 3070,
+      "date": "2026-02-24",
+      "categoryId": "entertainment",
+      "amount": 49.99,
+      "description": "UBER   *ONE MEMBERSHIP",
+      "notes": "CONTINUITY/SUBSCRIPTION MERCHT"
+    },
+    {
+      "id": 3071,
+      "date": "2026-02-25",
+      "categoryId": "entertainment",
+      "amount": 149,
+      "description": "AMAZING THAI RESTAURANG",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3072,
+      "date": "2026-02-25",
+      "categoryId": "entertainment",
+      "amount": 39,
+      "description": "APPLE.COM/BILL",
+      "notes": "DIGITAL GOODS – LARGE DIGITAL GOODS MERCHANT"
+    },
+    {
+      "id": 3073,
+      "date": "2026-02-27",
+      "categoryId": "entertainment",
+      "amount": 12,
+      "description": "APPLE.COM/BILL",
+      "notes": "DIGITAL GOODS – LARGE DIGITAL GOODS MERCHANT"
+    },
+    {
+      "id": 3074,
+      "date": "2026-02-27",
+      "categoryId": "entertainment",
+      "amount": 130,
+      "description": "KATALIN AND ALL THAT JAZZ",
+      "notes": "RESTAURANTS"
+    },
+    {
+      "id": 3075,
+      "date": "2026-02-27",
+      "categoryId": "clothing",
+      "amount": 702,
+      "description": "VOLT T31 GRANBY",
+      "notes": "MENS/WOMENS CLOTHING STORES"
+    }
+  ],
+  "savingsGoals": []
+}
