@@ -323,6 +323,12 @@ app.get('/api/family/:id/finances/summary/:month', (req, res) => {
   });
 });
 
+// ───────────── Frontend ─────────────
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // ───────────── Start ─────────────
 
 app.listen(PORT, '0.0.0.0', () => console.log(`✅ Family Finances running → http://0.0.0.0:${PORT}`));

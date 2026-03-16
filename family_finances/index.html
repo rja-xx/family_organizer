@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Finances</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3250;
+      --accent: #4f8ef7;
+      --accent2: #7ed321;
+      --danger: #e05c5c;
+      --text: #e8eaf6;
+      --muted: #8b90b0;
+      --radius: 10px;
+      --font: 'Segoe UI', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header h1 { font-size: 1.2rem; font-weight: 600; letter-spacing: .02em; }
+    header span { color: var(--muted); font-size: .85rem; }
+
+    .family-bar {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .family-bar label { color: var(--muted); font-size: .85rem; }
+    .family-bar input, .family-bar select, .family-bar button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: .85rem;
+    }
+    .family-bar button { background: var(--accent); border-color: var(--accent); cursor: pointer; font-weight: 600; }
+
+    nav {
+      display: flex;
+      gap: 4px;
+      padding: 12px 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav button {
+      background: none;
+      border: none;
+      color: var(--muted);
+      padding: 8px 18px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      cursor: pointer;
+      font-size: .9rem;
+      transition: color .15s, background .15s;
+    }
+    nav button:hover { color: var(--text); background: var(--surface2); }
+    nav button.active { color: var(--accent); background: var(--surface); border: 1px solid var(--border); border-bottom: 1px solid var(--bg); }
+
+    main { padding: 24px 28px; max-width: 1100px; }
+
+    .tab { display: none; }
+    .tab.active { display: block; }
+
+    h2 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 28px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+    .card .label { font-size: .78rem; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .05em; }
+    .card .value { font-size: 1.6rem; font-weight: 700; }
+    .card .value.green { color: var(--accent2); }
+    .card .value.red { color: var(--danger); }
+    .card .value.blue { color: var(--accent); }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th { text-align: left; padding: 10px 12px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }
+
+    /* Progress bar */
+    .prog-wrap { background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; margin-top: 4px; }
+    .prog-bar { height: 100%; border-radius: 4px; transition: width .3s; }
+
+    /* Category dot */
+    .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
+
+    /* Forms */
+    .form-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: flex-end; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: .78rem; color: var(--muted); }
+    .form-group input, .form-group select, .form-group textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 7px 11px;
+      font-size: .88rem;
+      min-width: 140px;
+    }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+    .btn { padding: 8px 18px; border-radius: 6px; border: none; cursor: pointer; font-size: .88rem; font-weight: 600; transition: opacity .15s; }
+    .btn:hover { opacity: .85; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-success { background: var(--accent2); color: #111; }
+    .btn-danger { background: var(--danger); color: #fff; padding: 4px 10px; font-size: .8rem; }
+    .btn-sm { padding: 4px 10px; font-size: .8rem; }
+    .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+
+    /* Month picker */
+    .month-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .month-row input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 7px 11px; font-size: .9rem; }
+
+    /* Savings goal card */
+    .goal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .goal-card .goal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .goal-card .goal-name { font-weight: 600; }
+    .goal-card .goal-meta { font-size: .82rem; color: var(--muted); margin-top: 4px; }
+
+    /* Color swatch */
+    input[type=color] { width: 44px; height: 34px; padding: 2px; border-radius: 6px; cursor: pointer; }
+
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .empty { color: var(--muted); font-size: .88rem; padding: 20px 0; text-align: center; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>💰</div>
+  <h1>Family Finances</h1>
+  <span id="family-label"></span>
+</header>
+
+<div class="family-bar">
+  <label>Family ID:</label>
+  <input id="family-input" type="text" placeholder="e.g. smith" value="default" style="width:140px" />
+  <button onclick="loadFamily()">Load</button>
+</div>
+
+<nav>
+  <button class="active" onclick="switchTab('dashboard', this)">Dashboard</button>
+  <button onclick="switchTab('budget', this)">Budget</button>
+  <button onclick="switchTab('expenses', this)">Expenses</button>
+  <button onclick="switchTab('savings', this)">Savings Goals</button>
+  <button onclick="switchTab('categories', this)">Categories</button>
+</nav>
+
+<main>
+
+<!-- ─── DASHBOARD ─── -->
+<div id="tab-dashboard" class="tab active">
+  <div class="month-row">
+    <label style="color:var(--muted);font-size:.85rem">Month:</label>
+    <input type="month" id="dash-month" />
+    <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">Refresh</button>
+  </div>
+  <div class="cards" id="dash-cards"></div>
+  <h2>Breakdown by Category</h2>
+  <div class="table-wrap">
+    <table id="dash-table">
+      <thead><tr><th>Category</th><th>Budgeted</th><th>Spent</th><th>Remaining</th><th style="width:160px">Progress</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── BUDGET ─── -->
+<div id="tab-budget" class="tab">
+  <div class="month-row">
+    <label style="color:var(--muted);font-size:.85rem">Month:</label>
+    <input type="month" id="budget-month" />
+    <button class="btn btn-ghost btn-sm" onclick="loadBudget()">Load</button>
+  </div>
+  <div class="form-row" style="margin-bottom:20px">
+    <div class="form-group">
+      <label>Monthly Income</label>
+      <input type="number" id="budget-income" placeholder="0.00" step="0.01" style="width:160px" />
+    </div>
+    <button class="btn btn-primary" style="align-self:flex-end" onclick="saveBudget()">Save Budget</button>
+  </div>
+  <div class="table-wrap">
+    <table id="budget-table">
+      <thead><tr><th>Category</th><th>Budgeted Amount</th><th>Notes</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── EXPENSES ─── -->
+<div id="tab-expenses" class="tab">
+  <div class="section-header">
+    <h2 style="margin:0">Add Expense</h2>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Date</label><input type="date" id="exp-date" /></div>
+    <div class="form-group"><label>Category</label><select id="exp-cat"></select></div>
+    <div class="form-group"><label>Amount</label><input type="number" id="exp-amount" placeholder="0.00" step="0.01" style="width:120px" /></div>
+    <div class="form-group"><label>Description</label><input type="text" id="exp-desc" placeholder="What was it?" style="width:200px" /></div>
+    <div class="form-group"><label>Notes</label><input type="text" id="exp-notes" placeholder="Optional" style="width:150px" /></div>
+    <button class="btn btn-success" style="align-self:flex-end" onclick="addExpense()">Add</button>
+  </div>
+
+  <div class="month-row">
+    <label style="color:var(--muted);font-size:.85rem">Filter month:</label>
+    <input type="month" id="exp-filter-month" />
+    <select id="exp-filter-cat" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 11px;font-size:.88rem">
+      <option value="">All categories</option>
+    </select>
+    <button class="btn btn-ghost btn-sm" onclick="loadExpenses()">Filter</button>
+  </div>
+
+  <div class="table-wrap">
+    <table id="exp-table">
+      <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th>Notes</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── SAVINGS ─── -->
+<div id="tab-savings" class="tab">
+  <div class="section-header"><h2 style="margin:0">Savings Goals</h2></div>
+  <div class="form-row">
+    <div class="form-group"><label>Goal Name</label><input type="text" id="goal-name" placeholder="e.g. Emergency Fund" style="width:200px" /></div>
+    <div class="form-group"><label>Target ($)</label><input type="number" id="goal-target" placeholder="10000" step="0.01" style="width:120px" /></div>
+    <div class="form-group"><label>Current ($)</label><input type="number" id="goal-current" placeholder="0" step="0.01" style="width:120px" /></div>
+    <div class="form-group"><label>Target Date</label><input type="date" id="goal-date" /></div>
+    <button class="btn btn-primary" style="align-self:flex-end" onclick="addGoal()">Add Goal</button>
+  </div>
+  <div id="goals-list"></div>
+</div>
+
+<!-- ─── CATEGORIES ─── -->
+<div id="tab-categories" class="tab">
+  <div class="section-header"><h2 style="margin:0">Categories</h2></div>
+  <div class="form-row">
+    <div class="form-group"><label>Name</label><input type="text" id="cat-name" placeholder="New category" style="width:180px" /></div>
+    <div class="form-group"><label>Color</label><input type="color" id="cat-color" value="#4f8ef7" /></div>
+    <button class="btn btn-primary" style="align-self:flex-end" onclick="addCategory()">Add</button>
+  </div>
+  <div class="table-wrap">
+    <table id="cat-table">
+      <thead><tr><th>Color</th><th>Name</th><th>ID</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ─── State ───
+let familyId = 'default';
+let categories = [];
+
+// ─── Helpers ───
+const api = (path, method = 'GET', body) => fetch(`/api/family/${familyId}/finances${path}`, {
+  method,
+  headers: body ? { 'Content-Type': 'application/json' } : {},
+  body: body ? JSON.stringify(body) : undefined
+}).then(r => r.json());
+
+function fmt(n) { return Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function thisMonth() { return new Date().toISOString().slice(0, 7); }
+function today() { return new Date().toISOString().slice(0, 10); }
+
+// ─── Init ───
+window.onload = () => {
+  document.getElementById('dash-month').value = thisMonth();
+  document.getElementById('budget-month').value = thisMonth();
+  document.getElementById('exp-date').value = today();
+  document.getElementById('exp-filter-month').value = thisMonth();
+  loadFamily();
+};
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'dashboard') loadDashboard();
+  if (id === 'budget') loadBudget();
+  if (id === 'expenses') loadExpenses();
+  if (id === 'savings') loadSavings();
+  if (id === 'categories') loadCategories();
+}
+
+async function loadFamily() {
+  familyId = document.getElementById('family-input').value.trim() || 'default';
+  document.getElementById('family-label').textContent = `/ ${familyId}`;
+  categories = await api('/categories');
+  populateCatSelects();
+  loadDashboard();
+}
+
+function populateCatSelects() {
+  ['exp-cat', 'exp-filter-cat'].forEach(id => {
+    const sel = document.getElementById(id);
+    const prev = sel.value;
+    sel.innerHTML = id === 'exp-filter-cat' ? '<option value="">All categories</option>' : '';
+    categories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.name;
+      sel.appendChild(opt);
+    });
+    if (prev) sel.value = prev;
+  });
+}
+
+// ─── Dashboard ───
+async function loadDashboard() {
+  const month = document.getElementById('dash-month').value || thisMonth();
+  const data = await api(`/summary/${month}`);
+
+  const cards = document.getElementById('dash-cards');
+  const remaining = data.income - data.totalSpent;
+  cards.innerHTML = `
+    <div class="card"><div class="label">Income</div><div class="value blue">$${fmt(data.income)}</div></div>
+    <div class="card"><div class="label">Budgeted</div><div class="value">${fmt(data.totalBudgeted)}</div></div>
+    <div class="card"><div class="label">Spent</div><div class="value red">$${fmt(data.totalSpent)}</div></div>
+    <div class="card"><div class="label">Remaining</div><div class="value ${remaining >= 0 ? 'green' : 'red'}">$${fmt(remaining)}</div></div>
+  `;
+
+  const tbody = document.querySelector('#dash-table tbody');
+  tbody.innerHTML = '';
+  (data.breakdown || []).filter(r => r.budgeted > 0 || r.actual > 0).forEach(r => {
+    const pct = r.budgeted > 0 ? Math.min(100, Math.round(r.actual / r.budgeted * 100)) : (r.actual > 0 ? 100 : 0);
+    const over = r.actual > r.budgeted && r.budgeted > 0;
+    const rem = r.budgeted - r.actual;
+    tbody.innerHTML += `<tr>
+      <td><span class="dot" style="background:${r.color}"></span>${r.name}</td>
+      <td>$${fmt(r.budgeted)}</td>
+      <td>$${fmt(r.actual)}</td>
+      <td style="color:${rem < 0 ? 'var(--danger)' : 'var(--accent2)'}">$${fmt(rem)}</td>
+      <td>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:2px">${pct}%</div>
+        <div class="prog-wrap"><div class="prog-bar" style="width:${pct}%;background:${over ? 'var(--danger)' : r.color}"></div></div>
+      </td>
+    </tr>`;
+  });
+  if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="5" class="empty">No data for this month yet.</td></tr>';
+}
+
+// ─── Budget ───
+let budgetData = null;
+async function loadBudget() {
+  const month = document.getElementById('budget-month').value || thisMonth();
+  budgetData = await api(`/budget/${month}`);
+  document.getElementById('budget-income').value = budgetData.income || '';
+  const tbody = document.querySelector('#budget-table tbody');
+  tbody.innerHTML = '';
+  budgetData.categories.forEach(entry => {
+    tbody.innerHTML += `<tr>
+      <td><span class="dot" style="background:${entry.color}"></span>${entry.name}</td>
+      <td><input type="number" step="0.01" value="${entry.budgeted || ''}" placeholder="0.00"
+        style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 9px;width:130px"
+        onchange="updateBudgetEntry('${entry.categoryId}', 'budgeted', this.value)" /></td>
+      <td><input type="text" value="${entry.notes || ''}" placeholder="notes"
+        style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 9px;width:200px"
+        onchange="updateBudgetEntry('${entry.categoryId}', 'notes', this.value)" /></td>
+    </tr>`;
+  });
+}
+
+function updateBudgetEntry(categoryId, field, value) {
+  if (!budgetData) return;
+  const entry = budgetData.categories.find(c => c.categoryId === categoryId);
+  if (entry) entry[field] = field === 'budgeted' ? parseFloat(value) || 0 : value;
+}
+
+async function saveBudget() {
+  if (!budgetData) return;
+  budgetData.income = parseFloat(document.getElementById('budget-income').value) || 0;
+  const month = document.getElementById('budget-month').value || thisMonth();
+  await api(`/budget/${month}`, 'POST', budgetData);
+  alert('Budget saved!');
+}
+
+// ─── Expenses ───
+async function loadExpenses() {
+  const month = document.getElementById('exp-filter-month').value;
+  const cat = document.getElementById('exp-filter-cat').value;
+  let qs = [];
+  if (month) qs.push(`month=${month}`);
+  if (cat) qs.push(`category=${cat}`);
+  const expenses = await api(`/expenses${qs.length ? '?' + qs.join('&') : ''}`);
+
+  const tbody = document.querySelector('#exp-table tbody');
+  tbody.innerHTML = '';
+  if (!expenses.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">No expenses found.</td></tr>'; return; }
+  expenses.sort((a, b) => b.date.localeCompare(a.date)).forEach(e => {
+    tbody.innerHTML += `<tr>
+      <td>${e.date}</td>
+      <td><span class="dot" style="background:${e.categoryColor}"></span>${e.categoryName}</td>
+      <td>${e.description || '—'}</td>
+      <td style="font-weight:600">$${fmt(e.amount)}</td>
+      <td style="color:var(--muted)">${e.notes || ''}</td>
+      <td><button class="btn btn-danger" onclick="deleteExpense(${e.id})">✕</button></td>
+    </tr>`;
+  });
+}
+
+async function addExpense() {
+  const date = document.getElementById('exp-date').value;
+  const categoryId = document.getElementById('exp-cat').value;
+  const amount = parseFloat(document.getElementById('exp-amount').value);
+  const description = document.getElementById('exp-desc').value;
+  const notes = document.getElementById('exp-notes').value;
+  if (!date || !categoryId || isNaN(amount)) { alert('Date, category and amount are required.'); return; }
+  await api('/expenses', 'POST', { date, categoryId, amount, description, notes });
+  document.getElementById('exp-amount').value = '';
+  document.getElementById('exp-desc').value = '';
+  document.getElementById('exp-notes').value = '';
+  loadExpenses();
+}
+
+async function deleteExpense(id) {
+  if (!confirm('Delete this expense?')) return;
+  await api(`/expenses/${id}`, 'DELETE');
+  loadExpenses();
+}
+
+// ─── Savings ───
+async function loadSavings() {
+  const goals = await api('/savings');
+  const el = document.getElementById('goals-list');
+  if (!goals.length) { el.innerHTML = '<div class="empty">No savings goals yet.</div>'; return; }
+  el.innerHTML = '';
+  goals.forEach(g => {
+    const pct = g.target > 0 ? Math.min(100, Math.round(g.current / g.target * 100)) : 0;
+    el.innerHTML += `<div class="goal-card">
+      <div class="goal-header">
+        <div class="goal-name">${g.name}</div>
+        <button class="btn btn-danger" onclick="deleteGoal(${g.id})">✕</button>
+      </div>
+      <div style="display:flex;gap:24px;align-items:center">
+        <div><span style="color:var(--accent2);font-size:1.3rem;font-weight:700">$${fmt(g.current)}</span>
+          <span style="color:var(--muted)"> / $${fmt(g.target)}</span></div>
+        <div style="flex:1"><div class="prog-wrap" style="height:8px"><div class="prog-bar" style="width:${pct}%;background:var(--accent)"></div></div></div>
+        <div style="color:var(--muted);font-size:.85rem">${pct}%</div>
+      </div>
+      <div class="goal-meta">${g.targetDate ? 'Target date: ' + g.targetDate : ''} ${g.notes ? '· ' + g.notes : ''}</div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <input type="number" placeholder="Update current amount" step="0.01"
+          style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 9px;width:200px"
+          id="goal-cur-${g.id}" value="${g.current}" />
+        <button class="btn btn-ghost btn-sm" onclick="updateGoal(${g.id}, ${g.target}, '${g.name}', '${g.targetDate || ''}')">Update</button>
+      </div>
+    </div>`;
+  });
+}
+
+async function addGoal() {
+  const name = document.getElementById('goal-name').value.trim();
+  const target = parseFloat(document.getElementById('goal-target').value);
+  const current = parseFloat(document.getElementById('goal-current').value) || 0;
+  const targetDate = document.getElementById('goal-date').value;
+  if (!name || isNaN(target)) { alert('Name and target amount are required.'); return; }
+  await api('/savings', 'POST', { name, target, current, targetDate });
+  document.getElementById('goal-name').value = '';
+  document.getElementById('goal-target').value = '';
+  document.getElementById('goal-current').value = '';
+  document.getElementById('goal-date').value = '';
+  loadSavings();
+}
+
+async function updateGoal(id, target, name, targetDate) {
+  const current = parseFloat(document.getElementById(`goal-cur-${id}`).value) || 0;
+  await api('/savings', 'POST', { id, name, target, current, targetDate });
+  loadSavings();
+}
+
+async function deleteGoal(id) {
+  if (!confirm('Delete this savings goal?')) return;
+  await api(`/savings/${id}`, 'DELETE');
+  loadSavings();
+}
+
+// ─── Categories ───
+async function loadCategories() {
+  const tbody = document.querySelector('#cat-table tbody');
+  tbody.innerHTML = '';
+  categories.forEach(c => {
+    tbody.innerHTML += `<tr>
+      <td><input type="color" value="${c.color}" onchange="updateCategory('${c.id}', '${c.name}', this.value)" style="width:36px;height:28px;padding:1px;border-radius:4px;border:1px solid var(--border)" /></td>
+      <td><input type="text" value="${c.name}"
+        style="background:transparent;border:none;color:var(--text);font-size:.88rem;width:180px"
+        onchange="updateCategory('${c.id}', this.value, '${c.color}')" /></td>
+      <td style="color:var(--muted);font-size:.8rem">${c.id}</td>
+      <td><button class="btn btn-danger" onclick="deleteCategory('${c.id}')">✕</button></td>
+    </tr>`;
+  });
+}
+
+async function addCategory() {
+  const name = document.getElementById('cat-name').value.trim();
+  const color = document.getElementById('cat-color').value;
+  if (!name) { alert('Name required'); return; }
+  await api('/categories', 'POST', { name, color });
+  document.getElementById('cat-name').value = '';
+  categories = await api('/categories');
+  populateCatSelects();
+  loadCategories();
+}
+
+async function updateCategory(id, name, color) {
+  await api(`/categories/${id}`, 'PUT', { name, color });
+  categories = await api('/categories');
+  populateCatSelects();
+}
+
+async function deleteCategory(id) {
+  if (!confirm('Delete this category? This will fail if it has linked expenses or budget entries.')) return;
+  const res = await api(`/categories/${id}`, 'DELETE');
+  if (res.error) { alert(`Cannot delete: ${res.error}\n${res.hint || ''}`); return; }
+  categories = await api('/categories');
+  populateCatSelects();
+  loadCategories();
+}
+</script>
+</body>
+</html>
