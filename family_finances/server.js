@@ -145,9 +145,9 @@ app.delete('/api/family/:id/finances/categories/:cid', (req, res) => {
 
 // ───────────── Budget ─────────────
 
-// POST /api/family/:id/finances/budget/copy — copy one month's budget to another
+// POST /api/family/:id/finances/budget-copy — copy one month's budget to another
 // body: { from: "YYYY-MM", to: "YYYY-MM", overwrite: bool }
-app.post('/api/family/:id/finances/budget/copy', (req, res) => {
+app.post('/api/family/:id/finances/budget-copy', (req, res) => {
   const data = readFinances(req.params.id);
   const { from, to, overwrite } = req.body;
   if (!from || !to) return res.status(400).json({ error: 'from and to are required' });
