@@ -1,0 +1,11 @@
+{
+  "name": "family-finances",
+  "version": "1.0.0",
+  "description": "Family finances module: budgeting, expenses, savings goals",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
