@@ -145,6 +145,31 @@ app.delete('/api/family/:id/finances/categories/:cid', (req, res) => {
 
 // ───────────── Budget ─────────────
 
+// POST /api/family/:id/finances/budget/copy — copy one month's budget to another
+// body: { from: "YYYY-MM", to: "YYYY-MM", overwrite: bool }
+app.post('/api/family/:id/finances/budget/copy', (req, res) => {
+  const data = readFinances(req.params.id);
+  const { from, to, overwrite } = req.body;
+  if (!from || !to) return res.status(400).json({ error: 'from and to are required' });
+  if (from === to) return res.status(400).json({ error: 'from and to must be different months' });
+
+  const source = data.budgets[from];
+  if (!source) return res.status(404).json({ error: `No budget found for ${from}` });
+
+  if (data.budgets[to] && !overwrite) {
+    return res.status(409).json({ error: `Budget for ${to} already exists`, hint: 'Pass overwrite: true to replace it.' });
+  }
+
+  // Deep copy, update month key
+  data.budgets[to] = {
+    ...JSON.parse(JSON.stringify(source)),
+    month: to
+  };
+
+  writeFinances(req.params.id, data);
+  res.json({ ok: true, copied: from, to });
+});
+
 // GET /api/family/:id/finances/budget/:month  (YYYY-MM)
 app.get('/api/family/:id/finances/budget/:month', (req, res) => {
   const data = readFinances(req.params.id);

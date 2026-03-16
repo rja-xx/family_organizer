@@ -201,6 +201,10 @@
     <label style="color:var(--muted);font-size:.85rem">Month:</label>
     <input type="month" id="budget-month" />
     <button class="btn btn-ghost btn-sm" onclick="loadBudget()">Load</button>
+    <span style="color:var(--border);margin:0 6px">|</span>
+    <label style="color:var(--muted);font-size:.85rem">Copy to:</label>
+    <input type="month" id="budget-copy-to" />
+    <button class="btn btn-ghost btn-sm" onclick="copyBudget()">Copy</button>
   </div>
   <div class="form-row" style="margin-bottom:20px">
     <div class="form-group">
@@ -446,6 +450,34 @@ async function saveBudget() {
   const month = document.getElementById('budget-month').value || thisMonth();
   await api(`/budget/${month}`, 'POST', budgetData);
   alert('Budget saved!');
+}
+
+async function copyBudget() {
+  const from = document.getElementById('budget-month').value;
+  const to = document.getElementById('budget-copy-to').value;
+  if (!from || !to) { alert('Select both a source month and a target month.'); return; }
+  if (from === to) { alert('Source and target month must be different.'); return; }
+
+  // Try without overwrite first
+  let res = await api('/budget/copy', 'POST', { from, to, overwrite: false });
+
+  if (res.error && res.hint) {
+    // Budget already exists — ask to overwrite
+    if (confirm(`A budget for ${to} already exists. Overwrite it?`)) {
+      res = await api('/budget/copy', 'POST', { from, to, overwrite: true });
+    } else {
+      return;
+    }
+  }
+
+  if (res.ok) {
+    alert(`Budget copied from ${from} → ${to}`);
+    document.getElementById('budget-month').value = to;
+    document.getElementById('budget-copy-to').value = '';
+    loadBudget();
+  } else {
+    alert(`Error: ${res.error}`);
+  }
 }
 
 // ─── Expenses ───
