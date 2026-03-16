@@ -257,8 +257,8 @@
   <div class="section-header"><h2 style="margin:0">Savings Goals</h2></div>
   <div class="form-row">
     <div class="form-group"><label>Goal Name</label><input type="text" id="goal-name" placeholder="e.g. Emergency Fund" style="width:200px" /></div>
-    <div class="form-group"><label>Target ($)</label><input type="number" id="goal-target" placeholder="10000" step="0.01" style="width:120px" /></div>
-    <div class="form-group"><label>Current ($)</label><input type="number" id="goal-current" placeholder="0" step="0.01" style="width:120px" /></div>
+    <div class="form-group"><label>Target (kr)</label><input type="number" id="goal-target" placeholder="10000" step="0.01" style="width:120px" /></div>
+    <div class="form-group"><label>Current (kr)</label><input type="number" id="goal-current" placeholder="0" step="0.01" style="width:120px" /></div>
     <div class="form-group"><label>Target Date</label><input type="date" id="goal-date" /></div>
     <button class="btn btn-primary" style="align-self:flex-end" onclick="addGoal()">Add Goal</button>
   </div>
@@ -295,7 +295,7 @@ const api = (path, method = 'GET', body) => fetch(`/api/family/${familyId}/finan
   body: body ? JSON.stringify(body) : undefined
 }).then(r => r.json());
 
-function fmt(n) { return Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmt(n) { return Number(n || 0).toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' kr'; }
 function thisMonth() { return new Date().toISOString().slice(0, 7); }
 function today() { return new Date().toISOString().slice(0, 10); }
 
@@ -391,10 +391,10 @@ async function loadDashboard() {
   const cards = document.getElementById('dash-cards');
   const remaining = data.income - data.totalSpent;
   cards.innerHTML = `
-    <div class="card"><div class="label">Income</div><div class="value blue">$${fmt(data.income)}</div></div>
+    <div class="card"><div class="label">Income</div><div class="value blue">${fmt(data.income)}</div></div>
     <div class="card"><div class="label">Budgeted</div><div class="value">${fmt(data.totalBudgeted)}</div></div>
-    <div class="card"><div class="label">Spent</div><div class="value red">$${fmt(data.totalSpent)}</div></div>
-    <div class="card"><div class="label">Remaining</div><div class="value ${remaining >= 0 ? 'green' : 'red'}">$${fmt(remaining)}</div></div>
+    <div class="card"><div class="label">Spent</div><div class="value red">${fmt(data.totalSpent)}</div></div>
+    <div class="card"><div class="label">Remaining</div><div class="value ${remaining >= 0 ? 'green' : 'red'}">${fmt(remaining)}</div></div>
   `;
 
   const tbody = document.querySelector('#dash-table tbody');
@@ -405,9 +405,9 @@ async function loadDashboard() {
     const rem = r.budgeted - r.actual;
     tbody.innerHTML += `<tr>
       <td><span class="dot" style="background:${r.color}"></span>${r.name}</td>
-      <td>$${fmt(r.budgeted)}</td>
-      <td>$${fmt(r.actual)}</td>
-      <td style="color:${rem < 0 ? 'var(--danger)' : 'var(--accent2)'}">$${fmt(rem)}</td>
+      <td>${fmt(r.budgeted)}</td>
+      <td>${fmt(r.actual)}</td>
+      <td style="color:${rem < 0 ? 'var(--danger)' : 'var(--accent2)'}">${fmt(rem)}</td>
       <td>
         <div style="font-size:.75rem;color:var(--muted);margin-bottom:2px">${pct}%</div>
         <div class="prog-wrap"><div class="prog-bar" style="width:${pct}%;background:${over ? 'var(--danger)' : r.color}"></div></div>
@@ -497,7 +497,7 @@ async function loadExpenses() {
       <td>${e.date}</td>
       <td><span class="dot" style="background:${e.categoryColor}"></span>${e.categoryName}</td>
       <td>${e.description || '—'}</td>
-      <td style="font-weight:600">$${fmt(e.amount)}</td>
+      <td style="font-weight:600">${fmt(e.amount)}</td>
       <td style="color:var(--muted)">${e.notes || ''}</td>
       <td><button class="btn btn-danger" onclick="deleteExpense(${e.id})">✕</button></td>
     </tr>`;
@@ -538,8 +538,8 @@ async function loadSavings() {
         <button class="btn btn-danger" onclick="deleteGoal(${g.id})">✕</button>
       </div>
       <div style="display:flex;gap:24px;align-items:center">
-        <div><span style="color:var(--accent2);font-size:1.3rem;font-weight:700">$${fmt(g.current)}</span>
-          <span style="color:var(--muted)"> / $${fmt(g.target)}</span></div>
+        <div><span style="color:var(--accent2);font-size:1.3rem;font-weight:700">${fmt(g.current)}</span>
+          <span style="color:var(--muted)"> / ${fmt(g.target)}</span></div>
         <div style="flex:1"><div class="prog-wrap" style="height:8px"><div class="prog-bar" style="width:${pct}%;background:var(--accent)"></div></div></div>
         <div style="color:var(--muted);font-size:.85rem">${pct}%</div>
       </div>
