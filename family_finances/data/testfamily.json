@@ -1,0 +1,116 @@
+{
+  "familyId": "testfamily",
+  "categories": [
+    { "id": "housing",       "name": "Housing",          "color": "#4A90E2" },
+    { "id": "food",          "name": "Food & Groceries",  "color": "#7ED321" },
+    { "id": "transport",     "name": "Transport",         "color": "#F5A623" },
+    { "id": "health",        "name": "Health",            "color": "#D0021B" },
+    { "id": "education",     "name": "Education",         "color": "#9B59B6" },
+    { "id": "entertainment", "name": "Entertainment",     "color": "#1ABC9C" },
+    { "id": "clothing",      "name": "Clothing",          "color": "#E67E22" },
+    { "id": "savings",       "name": "Savings",           "color": "#2ECC71" },
+    { "id": "utilities",     "name": "Utilities",         "color": "#95A5A6" },
+    { "id": "other",         "name": "Other",             "color": "#BDC3C7" }
+  ],
+  "budgets": {
+    "2026-02": {
+      "month": "2026-02",
+      "income": 6500,
+      "categories": [
+        { "categoryId": "housing",       "budgeted": 1800, "notes": "Rent + insurance" },
+        { "categoryId": "food",          "budgeted": 700,  "notes": "Groceries + occasional takeout" },
+        { "categoryId": "transport",     "budgeted": 400,  "notes": "Car payment + fuel" },
+        { "categoryId": "health",        "budgeted": 250,  "notes": "Insurance copays" },
+        { "categoryId": "education",     "budgeted": 200,  "notes": "Kids school fees" },
+        { "categoryId": "entertainment", "budgeted": 150,  "notes": "Streaming + outings" },
+        { "categoryId": "clothing",      "budgeted": 100,  "notes": "" },
+        { "categoryId": "savings",       "budgeted": 800,  "notes": "Emergency + vacation fund" },
+        { "categoryId": "utilities",     "budgeted": 300,  "notes": "Electric, water, internet" },
+        { "categoryId": "other",         "budgeted": 150,  "notes": "Misc" }
+      ]
+    },
+    "2026-03": {
+      "month": "2026-03",
+      "income": 6500,
+      "categories": [
+        { "categoryId": "housing",       "budgeted": 1800, "notes": "Rent + insurance" },
+        { "categoryId": "food",          "budgeted": 700,  "notes": "Groceries + occasional takeout" },
+        { "categoryId": "transport",     "budgeted": 400,  "notes": "Car payment + fuel" },
+        { "categoryId": "health",        "budgeted": 250,  "notes": "Insurance copays" },
+        { "categoryId": "education",     "budgeted": 200,  "notes": "Kids school fees" },
+        { "categoryId": "entertainment", "budgeted": 150,  "notes": "Streaming + outings" },
+        { "categoryId": "clothing",      "budgeted": 120,  "notes": "Spring wardrobe" },
+        { "categoryId": "savings",       "budgeted": 800,  "notes": "Emergency + vacation fund" },
+        { "categoryId": "utilities",     "budgeted": 300,  "notes": "Electric, water, internet" },
+        { "categoryId": "other",         "budgeted": 150,  "notes": "Misc" }
+      ]
+    }
+  },
+  "expenses": [
+    { "id": 1001, "date": "2026-02-02", "categoryId": "housing",       "amount": 1800.00, "description": "February rent",          "notes": "" },
+    { "id": 1002, "date": "2026-02-03", "categoryId": "utilities",     "amount": 89.50,   "description": "Electric bill",           "notes": "" },
+    { "id": 1003, "date": "2026-02-04", "categoryId": "food",          "amount": 143.20,  "description": "Weekly groceries",        "notes": "Supermarket" },
+    { "id": 1004, "date": "2026-02-06", "categoryId": "transport",     "amount": 320.00,  "description": "Car payment",             "notes": "" },
+    { "id": 1005, "date": "2026-02-07", "categoryId": "utilities",     "amount": 54.00,   "description": "Internet bill",           "notes": "" },
+    { "id": 1006, "date": "2026-02-08", "categoryId": "entertainment", "amount": 29.99,   "description": "Streaming services",      "notes": "Netflix + Spotify" },
+    { "id": 1007, "date": "2026-02-10", "categoryId": "food",          "amount": 67.80,   "description": "Takeout dinner",          "notes": "Pizza night" },
+    { "id": 1008, "date": "2026-02-11", "categoryId": "food",          "amount": 128.40,  "description": "Weekly groceries",        "notes": "" },
+    { "id": 1009, "date": "2026-02-12", "categoryId": "health",        "amount": 45.00,   "description": "Doctor copay",            "notes": "" },
+    { "id": 1010, "date": "2026-02-13", "categoryId": "transport",     "amount": 62.30,   "description": "Fuel",                    "notes": "" },
+    { "id": 1011, "date": "2026-02-14", "categoryId": "entertainment", "amount": 85.00,   "description": "Valentine's dinner",      "notes": "Restaurant" },
+    { "id": 1012, "date": "2026-02-15", "categoryId": "savings",       "amount": 800.00,  "description": "Monthly savings transfer","notes": "" },
+    { "id": 1013, "date": "2026-02-17", "categoryId": "food",          "amount": 134.90,  "description": "Weekly groceries",        "notes": "" },
+    { "id": 1014, "date": "2026-02-18", "categoryId": "education",     "amount": 200.00,  "description": "School fees",             "notes": "February" },
+    { "id": 1015, "date": "2026-02-19", "categoryId": "clothing",      "amount": 74.50,   "description": "Kids shoes",              "notes": "" },
+    { "id": 1016, "date": "2026-02-20", "categoryId": "utilities",     "amount": 42.00,   "description": "Water bill",              "notes": "" },
+    { "id": 1017, "date": "2026-02-21", "categoryId": "health",        "amount": 38.00,   "description": "Pharmacy",                "notes": "Prescription" },
+    { "id": 1018, "date": "2026-02-22", "categoryId": "food",          "amount": 155.10,  "description": "Weekly groceries",        "notes": "Stocked up" },
+    { "id": 1019, "date": "2026-02-24", "categoryId": "transport",     "amount": 58.00,   "description": "Fuel",                    "notes": "" },
+    { "id": 1020, "date": "2026-02-25", "categoryId": "other",         "amount": 35.00,   "description": "Haircuts",                "notes": "" },
+    { "id": 1021, "date": "2026-02-26", "categoryId": "entertainment", "amount": 22.00,   "description": "Cinema",                  "notes": "Family movie night" },
+    { "id": 1022, "date": "2026-02-27", "categoryId": "health",        "amount": 120.00,  "description": "Dental checkup",          "notes": "" },
+    { "id": 1023, "date": "2026-02-28", "categoryId": "other",         "amount": 48.20,   "description": "Misc household items",    "notes": "" },
+
+    { "id": 2001, "date": "2026-03-01", "categoryId": "housing",       "amount": 1800.00, "description": "March rent",             "notes": "" },
+    { "id": 2002, "date": "2026-03-02", "categoryId": "utilities",     "amount": 92.10,   "description": "Electric bill",          "notes": "" },
+    { "id": 2003, "date": "2026-03-03", "categoryId": "food",          "amount": 138.60,  "description": "Weekly groceries",       "notes": "" },
+    { "id": 2004, "date": "2026-03-05", "categoryId": "transport",     "amount": 320.00,  "description": "Car payment",            "notes": "" },
+    { "id": 2005, "date": "2026-03-06", "categoryId": "utilities",     "amount": 54.00,   "description": "Internet bill",          "notes": "" },
+    { "id": 2006, "date": "2026-03-07", "categoryId": "entertainment", "amount": 29.99,   "description": "Streaming services",     "notes": "Netflix + Spotify" },
+    { "id": 2007, "date": "2026-03-08", "categoryId": "food",          "amount": 45.00,   "description": "Takeout lunch",          "notes": "" },
+    { "id": 2008, "date": "2026-03-10", "categoryId": "food",          "amount": 162.30,  "description": "Weekly groceries",       "notes": "Bulk buy" },
+    { "id": 2009, "date": "2026-03-11", "categoryId": "health",        "amount": 55.00,   "description": "Physio session",         "notes": "" },
+    { "id": 2010, "date": "2026-03-12", "categoryId": "transport",     "amount": 71.40,   "description": "Fuel",                   "notes": "" },
+    { "id": 2011, "date": "2026-03-13", "categoryId": "clothing",      "amount": 189.90,  "description": "Spring clothes",         "notes": "Over budget a bit" },
+    { "id": 2012, "date": "2026-03-14", "categoryId": "savings",       "amount": 800.00,  "description": "Monthly savings transfer","notes": "" },
+    { "id": 2013, "date": "2026-03-15", "categoryId": "food",          "amount": 129.80,  "description": "Weekly groceries",       "notes": "" },
+    { "id": 2014, "date": "2026-03-15", "categoryId": "education",     "amount": 200.00,  "description": "School fees",            "notes": "March" },
+    { "id": 2015, "date": "2026-03-16", "categoryId": "other",         "amount": 22.50,   "description": "Coffee & snacks",        "notes": "Work week" }
+  ],
+  "savingsGoals": [
+    {
+      "id": 9001,
+      "name": "Emergency Fund",
+      "target": 15000,
+      "current": 6400,
+      "targetDate": "2026-12-31",
+      "notes": "3 months expenses"
+    },
+    {
+      "id": 9002,
+      "name": "Summer Vacation",
+      "target": 3500,
+      "current": 1200,
+      "targetDate": "2026-06-01",
+      "notes": "Beach trip"
+    },
+    {
+      "id": 9003,
+      "name": "New Laptop",
+      "target": 1800,
+      "current": 1800,
+      "targetDate": "2026-03-01",
+      "notes": "✅ Done!"
+    }
+  ]
+}

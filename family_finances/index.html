@@ -161,9 +161,11 @@
 </header>
 
 <div class="family-bar">
-  <label>Family ID:</label>
-  <input id="family-input" type="text" placeholder="e.g. smith" value="default" style="width:140px" />
-  <button onclick="loadFamily()">Load</button>
+  <label>Family:</label>
+  <select id="family-select" onchange="onFamilySelect()" style="min-width:160px"></select>
+  <span style="color:var(--muted);font-size:.82rem">or new:</span>
+  <input id="family-input" type="text" placeholder="family ID" style="width:120px" />
+  <button onclick="loadFamilyFromInput()">Load / Create</button>
 </div>
 
 <nav>
@@ -299,8 +301,56 @@ window.onload = () => {
   document.getElementById('budget-month').value = thisMonth();
   document.getElementById('exp-date').value = today();
   document.getElementById('exp-filter-month').value = thisMonth();
-  loadFamily();
+  initFamilyDropdown();
 };
+
+async function initFamilyDropdown() {
+  const families = await fetch('/api/finances/families').then(r => r.json()).catch(() => []);
+  const sel = document.getElementById('family-select');
+  sel.innerHTML = '';
+  if (families.length === 0) {
+    sel.innerHTML = '<option value="">— no families yet —</option>';
+  } else {
+    families.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = f.name || f.id;
+      sel.appendChild(opt);
+    });
+  }
+  // Load first family by default
+  if (families.length > 0) {
+    familyId = families[0].id;
+    document.getElementById('family-input').value = '';
+    document.getElementById('family-label').textContent = `/ ${familyId}`;
+    categories = await api('/categories');
+    populateCatSelects();
+    loadDashboard();
+  }
+}
+
+function onFamilySelect() {
+  const sel = document.getElementById('family-select');
+  if (sel.value) {
+    familyId = sel.value;
+    document.getElementById('family-input').value = '';
+    document.getElementById('family-label').textContent = `/ ${familyId}`;
+    api('/categories').then(c => { categories = c; populateCatSelects(); loadDashboard(); });
+  }
+}
+
+async function loadFamilyFromInput() {
+  const val = document.getElementById('family-input').value.trim();
+  if (!val) return;
+  familyId = val;
+  document.getElementById('family-label').textContent = `/ ${familyId}`;
+  categories = await api('/categories');
+  populateCatSelects();
+  loadDashboard();
+  // Refresh dropdown to include the new family
+  await initFamilyDropdown();
+  document.getElementById('family-select').value = familyId;
+}
 
 function switchTab(id, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -312,14 +362,6 @@ function switchTab(id, btn) {
   if (id === 'expenses') loadExpenses();
   if (id === 'savings') loadSavings();
   if (id === 'categories') loadCategories();
-}
-
-async function loadFamily() {
-  familyId = document.getElementById('family-input').value.trim() || 'default';
-  document.getElementById('family-label').textContent = `/ ${familyId}`;
-  categories = await api('/categories');
-  populateCatSelects();
-  loadDashboard();
 }
 
 function populateCatSelects() {

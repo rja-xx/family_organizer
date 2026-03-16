@@ -69,6 +69,21 @@ function initMonth(data, month) {
   return data.budgets[month];
 }
 
+// ───────────── Families ─────────────
+
+// GET /api/finances/families — list all known families
+app.get('/api/finances/families', (req, res) => {
+  if (!fs.existsSync(DATA_DIR)) return res.json([]);
+  const files = fs.readdirSync(DATA_DIR).filter(f => f.endsWith('.json'));
+  const families = files.map(f => {
+    try {
+      const d = JSON.parse(fs.readFileSync(path.join(DATA_DIR, f), 'utf8'));
+      return { id: d.familyId, name: d.name || d.familyId };
+    } catch { return null; }
+  }).filter(Boolean);
+  res.json(families);
+});
+
 // ───────────── Categories ─────────────
 
 // GET /api/family/:id/finances/categories
